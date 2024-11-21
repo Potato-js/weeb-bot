@@ -16,7 +16,10 @@ class Games(commands.Cog):
             description=f"You rolled a {dice_roll}"
         )
         response_embed.set_footer("Created by weeaboo")
-        await ctx.send("Hello")
+        # try:
+        await ctx.send(embed=response_embed)
+        # except Exception as e:
+        #     print(e)
 
 
 async def setup(bot):
