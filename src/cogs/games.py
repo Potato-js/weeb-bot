@@ -1,5 +1,6 @@
 import discord
 import random
+import sqlite3
 
 from discord.ext import commands
 
@@ -8,8 +9,75 @@ class Games(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
 
-    @commands.command()
-    async def dice(self, ctx):
+    @commands.Cog.listener()
+    async def on_ready(self):
+        # Connect to DB
+        conn = sqlite3.connect("./src/databases/counting.db")
+        cursor = conn.cursor()
+
+        # Create table if doesn't exist
+        cursor.execute(
+            """
+        CREATE TABLE IF NOT EXISTS counting_channels (
+            channel_id INTEGER PRIMARY KEY,
+            count INTEGER DEFAULT 1
+        )
+        """
+        )
+        conn.commit()
+        cursor.close()
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return  # Ignore bot messages
+
+        conn = sqlite3.connect("./src/databases/counting.db")
+        cursor = conn.cursor()
+        channel_id = message.channel.id
+
+        # Check if the channel is a counting channel
+        cursor.execute(
+            "SELECT count FROM counting_channels WHERE channel_id = ?", (channel_id,)
+        )
+        result = cursor.fetchone()
+
+        if result:
+            current_count = result[0]
+            try:
+                user_number = int(message.content)
+
+                if user_number == current_count:
+                    new_count = current_count + 1
+                    cursor.execute(
+                        "UPDATE counting_channels SET count = ? WHERE channel_id = ?",
+                        (new_count, channel_id),
+                    )
+                    conn.commit()
+                    await message.add_reaction("✅")
+                else:
+                    await message.channel.send(
+                        f"Incorrect Number! The last correct number was {current_count}. Resetting back to 1."
+                    )
+                    cursor.execute(
+                        "UPDATE counting_channels SET count = 1 WHERE channel_id = ?",
+                        (channel_id,),
+                    )
+                    conn.commit()
+            except ValueError:
+                await message.channel.send("Please enter a valid number!")
+        else:
+            # Ignore messages in non-counting channels
+            pass
+
+        cursor.close()
+        conn.close()
+
+        # Ensure other commands still work
+        await self.bot.process_commands(message)
+
+    @commands.command(aliases=["dice", "roll", "diceroll"])
+    async def games_diceroll(self, ctx):
         dice_roll = random.randint(1, 6)
         # print(dice_roll)
         response_embed = discord.Embed(
@@ -21,9 +89,58 @@ class Games(commands.Cog):
         except Exception as e:
             print(e)
 
-    @commands.command()
-    async def setup_counter(self, ctx):  # TODO: Make this command
-        pass
+    @commands.command(aliases=["csetup"])
+    async def games_setup_counting(self, ctx):
+        """Setup for the Counting Channel"""
+        try:
+            guild = ctx.guild
+            existing_channel = discord.utils.get(guild.channels, name="counting")
+            conn = sqlite3.connect("./src/databases/counting.db")
+            cursor = conn.cursor()
+
+            if existing_channel:
+                # Check if the existing channel is in the database
+                cursor.execute(
+                    "SELECT count FROM counting_channels WHERE channel_id = ?",
+                    (existing_channel.id,),
+                )
+                result = cursor.fetchone()
+                if result is None:
+                    cursor.execute(
+                        "INSERT INTO counting_channels (channel_id, count) VALUES (?, 1)",
+                        (existing_channel.id,),
+                    )
+                    conn.commit()
+                embed = discord.Embed(
+                    title="Warning!",
+                    description=f"A counting channel already exists! Channel: {existing_channel.mention}",
+                    color=discord.Color.yellow(),
+                )
+                await ctx.send(embed=embed)
+                print("Existing channel found and reused.")
+                cursor.close()
+                conn.close()
+                return
+
+            # Create the counting channel
+            counting_channel = await guild.create_text_channel("counting")
+            cursor.execute(
+                "INSERT INTO counting_channels (channel_id, count) VALUES (?, 1)",
+                (counting_channel.id,),
+            )
+            conn.commit()
+            embed = discord.Embed(
+                title="Success!",
+                description=f"Counting channel created: {counting_channel.mention}",
+                color=discord.Color.green(),
+            )
+            await ctx.send(embed=embed)
+            print("New counting channel created.")
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            print(f"Error in games_setup_counting: {e}")
+            await ctx.send(f"An error occurred: {e}")
 
 
 async def setup(bot):

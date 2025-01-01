@@ -19,7 +19,7 @@ async def load_cogs():
 
 @bot.event
 async def on_ready():
-    print(f"Client {bot.user} is ready")
+    logger.info(f"Client {bot.user} is ready")
 
 
 async def login(token):
