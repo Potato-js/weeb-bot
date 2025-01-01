@@ -3,6 +3,10 @@ import random
 import sqlite3
 
 from discord.ext import commands
+from src.utils.logger import setup_logger
+from src.utils.embeds import EmbedUtils
+
+logger = setup_logger()
 
 
 class Games(commands.Cog):
@@ -74,20 +78,29 @@ class Games(commands.Cog):
         conn.close()
 
         # Ensure other commands still work
-        await self.bot.process_commands(message)
+        # await self.bot.process_commands(message)
 
     @commands.command(aliases=["dice", "roll", "diceroll"])
+    @commands.cooldown(1, 15, commands.BucketType.user)
     async def games_diceroll(self, ctx):
         dice_roll = random.randint(1, 6)
-        # print(dice_roll)
-        response_embed = discord.Embed(
-            title="Dice roll 🎲", description=f"You rolled a {dice_roll}"
+        response_embed = EmbedUtils.create_embed(
+            title="Dice Roll 🎲",
+            description=f"You rolled a `{dice_roll}`",
+            color=discord.Color.random(),
         )
-        response_embed.set_footer(text="Made by weeaboo")
-        try:
-            await ctx.send(embed=response_embed)
-        except Exception as e:
-            print(e)
+
+        await ctx.send(embed=response_embed)
+        # try:
+        #     await ctx.send(embed=response_embed)
+        # except Exception as e:
+        #     logger.error(e)
+
+    @games_diceroll.error
+    async def games_diceroll_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            cooldown_embed = EmbedUtils.cooldown_embed(remaining_time=error.retry_after)
+            await ctx.send(embed=cooldown_embed)
 
     @commands.command(aliases=["csetup"])
     async def games_setup_counting(self, ctx):
@@ -117,7 +130,7 @@ class Games(commands.Cog):
                     color=discord.Color.yellow(),
                 )
                 await ctx.send(embed=embed)
-                print("Existing channel found and reused.")
+                logger.warning("Existing channel found and reused.")
                 cursor.close()
                 conn.close()
                 return
@@ -135,11 +148,11 @@ class Games(commands.Cog):
                 color=discord.Color.green(),
             )
             await ctx.send(embed=embed)
-            print("New counting channel created.")
+            logger.warning("New counting channel created.")
             cursor.close()
             conn.close()
         except Exception as e:
-            print(f"Error in games_setup_counting: {e}")
+            logger.error(f"Error in games_setup_counting: {e}")
             await ctx.send(f"An error occurred: {e}")
 
 
