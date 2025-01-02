@@ -80,9 +80,14 @@ class Games(commands.Cog):
         # Ensure other commands still work
         # await self.bot.process_commands(message)
 
-    @commands.command(aliases=["dice", "roll", "diceroll"])
+    @commands.hybrid_command(
+        name="diceroll",
+        description="A die gets rolled and gives a result 1-6",
+        aliases=["dice", "roll"],
+    )
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def games_diceroll(self, ctx):
+        """ "A die gets rolled and gives a result 1-6"""
         dice_roll = random.randint(1, 6)
         response_embed = EmbedUtils.create_embed(
             title="Dice Roll 🎲",
@@ -102,7 +107,9 @@ class Games(commands.Cog):
             cooldown_embed = EmbedUtils.cooldown_embed(remaining_time=error.retry_after)
             await ctx.send(embed=cooldown_embed)
 
-    @commands.command(aliases=["csetup"])
+    @commands.hybrid_command(
+        name="csetup", description="Setup for the Counting Channel"
+    )
     async def games_setup_counting(self, ctx):
         """Setup for the Counting Channel"""
         try:
@@ -124,10 +131,8 @@ class Games(commands.Cog):
                         (existing_channel.id,),
                     )
                     conn.commit()
-                embed = discord.Embed(
-                    title="Warning!",
-                    description=f"A counting channel already exists! Channel: {existing_channel.mention}",
-                    color=discord.Color.yellow(),
+                embed = EmbedUtils.warning_embed(
+                    description=f"A counting channel already exists! Channel: {existing_channel.mention}"
                 )
                 await ctx.send(embed=embed)
                 logger.warning("Existing channel found and reused.")
@@ -142,11 +147,10 @@ class Games(commands.Cog):
                 (counting_channel.id,),
             )
             conn.commit()
-            embed = discord.Embed(
-                title="Success!",
+            embed = EmbedUtils.success_embed(
                 description=f"Counting channel created: {counting_channel.mention}",
-                color=discord.Color.green(),
             )
+
             await ctx.send(embed=embed)
             logger.warning("New counting channel created.")
             cursor.close()

@@ -67,10 +67,7 @@ class EmbedUtils:
         :return: A discord.Embed object.
         """
         return EmbedUtils.create_embed(
-            description=description,
-            title=title,
-            color=discord.Color.green(),
-            footer="© 2024 weeaboo",
+            description=description, title=title, color=discord.Color.green()
         )
 
     @staticmethod
@@ -85,10 +82,7 @@ class EmbedUtils:
         :return: A discord.Embed object.
         """
         return EmbedUtils.create_embed(
-            description=description,
-            title=title,
-            color=discord.Color.red(),
-            footer="© 2025 weeaboo",
+            description=description, title=title, color=discord.Color.red()
         )
 
     @staticmethod
@@ -106,7 +100,21 @@ class EmbedUtils:
             description=description,
             title="Cooldown Active",
             color=discord.Color.yellow(),
-            footer="© 2025 weeaboo",
+        )
+
+    @staticmethod
+    def warning_embed(
+        description: str, title: Optional[str] = "Warning!"
+    ) -> discord.Embed:
+        """
+        Creates a warning embed with a yellow color
+
+        :param description: The description of the embed (required)
+        :param title: The title of the embed (default: Warning!)
+        """
+
+        return EmbedUtils.create_embed(
+            description=description, title=title, color=discord.Color.yellow()
         )
 
 

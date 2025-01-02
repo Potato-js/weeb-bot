@@ -3,7 +3,7 @@ import logging
 
 def setup_logger():
     # Create a custom logger
-    logger = logging.getLogger("drained")
+    logger = logging.getLogger("weeb-bot")
     logger.setLevel(logging.DEBUG)
 
     # Create a console handler and set the level to debug
