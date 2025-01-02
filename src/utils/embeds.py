@@ -9,7 +9,7 @@ class EmbedUtils:
         title: Optional[str] = None,
         color: discord.Color = discord.Color.blue(),
         fields: Optional[List[dict]] = None,
-        footer: Optional[str] = "© 2024 weeaboo",
+        footer: Optional[str] = "© 2025 weeaboo",
         thumbnail_url: Optional[str] = None,
         image_url: Optional[str] = None,
         author: Optional[dict] = None,
@@ -88,7 +88,7 @@ class EmbedUtils:
             description=description,
             title=title,
             color=discord.Color.red(),
-            footer="© 2024 weeaboo",
+            footer="© 2025 weeaboo",
         )
 
     @staticmethod
@@ -106,6 +106,7 @@ class EmbedUtils:
             description=description,
             title="Cooldown Active",
             color=discord.Color.yellow(),
+            footer="© 2025 weeaboo",
         )
 
 

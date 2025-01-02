@@ -1,3 +1,5 @@
 discord.py
 python-dotenv
 wavelink
+flask
+flask-discord

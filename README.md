@@ -11,7 +11,7 @@ I got bored so I'm working on this until I get bored again or school over runs m
   - [ ] Ban
   - [ ] Kick
   - [ ] Jail
-  - [ ] FakePerms
+  - [ ] FakePerms w/ Dashboard
   - [ ] Other things I will think about
 - [ ] Games
   - [x] Counter
