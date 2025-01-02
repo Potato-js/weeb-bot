@@ -5,7 +5,7 @@ from os import getenv
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = "super_secret_key"
+    app.secret_key = getenv("FLASK_SECRET_KEY")
 
     CLIENT_ID = getenv("DISCORD_CLIENT_ID")
     CLIENT_SECRET = getenv("DISCORD_CLIENT_SECRET")
@@ -17,6 +17,7 @@ def create_app():
     app.config["DISCORD_CLIENT_SECRET"] = CLIENT_SECRET
     app.config["DISCORD_REDIRECT_URI"] = REDIRECT_URI
     app.config["DISCORD_BOT_TOKEN"] = TOKEN
+    app.config["DISCORD_SCOPES"] = ["identify", "guilds"]
 
     # Initialize Discord OAuth
     discord = DiscordOAuth2Session(app)
@@ -38,8 +39,13 @@ def create_app():
     def dashboard():
         if not discord.authorized:
             return redirect(url_for("login"))
+
         user = discord.fetch_user()
-        return render_template("dashboard.html", user=user)
+        guilds = discord.fetch_guilds()
+
+        admin_guild = [guild for guild in guilds if guild.permissions.administrator]
+
+        return render_template("dashboard.html", user=user, guilds=admin_guild)
 
     @app.route("/logout/")
     def logout():

@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fake Perms Dashboard</title>
+    <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gray-100 text-gray-800">
     <header class="bg-blue-600 text-white py-4">
       <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-2xl font-bold">Fake Perms Dashboard</h1>
+        <h1 class="text-2xl font-bold">Dashboard</h1>
         <div>
           <span class="mr-4">Welcome, {{ user.username }}!</span>
           <a
@@ -25,7 +23,7 @@
       <section class="mb-8">
         <h2 class="text-xl font-semibold mb-4">Your Servers</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {% for guild in discord.fetch_guilds() %}
+          {% for guild in guilds %}
           <div class="bg-white shadow rounded p-4">
             <h3 class="text-lg font-bold">{{ guild.name }}</h3>
             <p class="text-sm text-gray-600">ID: {{ guild.id }}</p>
@@ -38,18 +36,11 @@
           {% endfor %}
         </div>
       </section>
-
-      <section>
-        <h2 class="text-xl font-semibold mb-4">Server Actions</h2>
-        <p class="text-gray-600">
-          Click on a server above to manage roles and create fake permissions.
-        </p>
-      </section>
     </main>
 
     <footer class="bg-gray-800 text-white py-4">
       <div class="container mx-auto text-center">
-        <p>&copy; 2025 Fake Perms Dashboard. All rights reserved.</p>
+        <p>&copy; 2025 weeaboo. All rights reserved.</p>
       </div>
     </footer>
   </body>
