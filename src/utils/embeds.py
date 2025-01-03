@@ -151,3 +151,4 @@ class EmbedUtils:
 
 # success = EmbedUtils.success_embed(description="Operation completed successfully.")
 # error = EmbedUtils.error_embed(description="Something went wrong.")
+# warning = EmbedUtils.warning_embed(description="This is a warning.")
