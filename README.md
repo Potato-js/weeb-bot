@@ -1,15 +1,26 @@
 # weeb-bot
   
-I got bored so I'm working on this until I get bored again or school over runs me.
+A Free and Open-Source Discord Bot with Premium and Advanced Features with a local dashboard
 
-## Future Plans
+## About
+
+This is a bot I started purely for fun. The bot is fully coded in python with an added dashboard coded in Discord Flask. If you have any features or any bugs check the issue template. More features will be added soon! Check the roadmap on what I'm planning to add.
+
+## Setup
+
+1. Create a `.env` file and refer to the `.env.example` for all environment variables
+2. Install all dependancies using `pip install -r requirements.txt` or `pip3 install -r requirements.txt` *NOTE: Make sure you are using Python 3.11>= to check run `python3 -v`*
+3. Once installed all the dependancies run `python main.py` or `python3 main.py` and `python dashboard.py` or `python3 dashboard.py` to run the dashboard if you are using any leveling modules or fake perms.
+
+## Roadmap
+
+More features will be added into the roadmap once the ideas start flowing in.
 
 - [ ] Leveling System
   - [ ] Basic XP system
   - [ ] Add A Dashboard for editing EVERYTHING + the commands to start with
 - [ ] Moderation
-  - [ ] Ban
-  - [ ] Kick
+  - [ ] Typical Moderation Commands (ban, kick, timeout etc...)
   - [ ] Jail
   - [ ] FakePerms w/ Dashboard
   - [ ] Other things I will think about
