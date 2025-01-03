@@ -25,7 +25,7 @@ class Moderation(commands.Cog):
             description=f"{member.mention} has been kicked from the server for *{reason}*.",
             color=discord.Color.red(),
         )
-        await ctx.send(embed=kick_embed(member, reason))
+        await ctx.send(embed=kick_embed)
 
 
 async def setup(bot):
