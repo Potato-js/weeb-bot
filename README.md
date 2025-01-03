@@ -1,6 +1,6 @@
 # weeb-bot
   
-A Free and Open-Source Discord Bot with Premium and Advanced Features with a local dashboard
+A Free and Open-Source Discord Bot with Premium and Advanced Features with a local dashboard **NOTE: The dashboard is STILL a WIP DO NOT USE IT**
 
 ## About
 
