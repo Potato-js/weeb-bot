@@ -1,3 +1,7 @@
+"""
+Logger used in the bot
+"""
+
 import logging
 
 

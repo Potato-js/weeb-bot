@@ -1,3 +1,7 @@
+"""
+All embed utilities incl. success, error, cooldown, warning
+"""
+
 import discord
 from typing import Optional, List
 
