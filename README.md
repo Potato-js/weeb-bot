@@ -15,7 +15,7 @@ This is a bot I started purely for fun. The bot is fully coded in python with an
 ## Requirements
 
 - Python 3.11 or higher
-- Lavalink 4 (**You can use a server instead of using a local server**)
+- ~~Lavalink 4 (**You can use a server instead of using a local server**)~~ **Work in progress feture
 
 ## Setup
 
@@ -29,7 +29,7 @@ More features will be added into the roadmap once the ideas start flowing in.
 
 - [ ] Leveling System
   - [ ] Basic XP system
-  - [ ] Add A Dashboard for editing EVERYTHING + the commands to start with
+  - [ ] Add A Dashboard for editing EVERYTHING + the commands to start with **
 - [ ] Moderation *
   - [ ] Typical Moderation Commands (ban, kick, timeout etc...) *
   - [ ] Jail
@@ -44,15 +44,18 @@ More features will be added into the roadmap once the ideas start flowing in.
   - [ ] Bank Accounts
   - [ ] Gambling 🎰
   - [ ] Begging
-- [ ] Music
-- [ ] Statistics on Games
-  - [ ] Valorant
+- [ ] Music **
+  - [ ] Lyrics
+  - [ ] Spotify Support
+- [ ] Statistics on some games **
+  - [ ] Valorant (limited to only player stats)
   - [ ] Hypixel
   - [ ] Roblox
 - [ ] Utilites
   - [ ] I dunno we'll see :)
 
 (*) In progress
+(**) Possible Addition it can be removed at anytime
 
 ## License
 
