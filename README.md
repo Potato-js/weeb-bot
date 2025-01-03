@@ -45,6 +45,10 @@ More features will be added into the roadmap once the ideas start flowing in.
   - [ ] Gambling 🎰
   - [ ] Begging
 - [ ] Music
+- [ ] Statistics on Games
+  - [ ] Valorant
+  - [ ] Hypixel
+  - [ ] Roblox
 - [ ] Utilites
   - [ ] I dunno we'll see :)
 
