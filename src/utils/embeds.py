@@ -98,7 +98,7 @@ class EmbedUtils:
         :return: A discord.Embed object.
         """
         description = f"""
-        This command is on a cooldown! Please wait **{remaining_time:.1f}s** before using this command!
+        ❗ | This command is on a cooldown! Please wait **{remaining_time:.1f}s** before using this command!
         """
         return EmbedUtils.create_embed(
             description=description,
@@ -124,13 +124,13 @@ class EmbedUtils:
     @staticmethod
     def user_invalid_permissions():
         return EmbedUtils.warning_embed(
-            description="You do not have the required permissions to run this command."
+            description="⚠ | You do not have the required permissions to run this command."
         )
 
     @staticmethod
     def bot_invalid_permissions():
         return EmbedUtils.warning_embed(
-            description="I do not have the required permissions to run this command. Give my role Administrator permissions to avoid this in the future."
+            description="⚠ | I do not have the required permissions to run this command. Give my role Administrator permissions to avoid this in the future."
         )
 
 
