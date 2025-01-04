@@ -10,6 +10,7 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # TODO: Make this work with fakeperms
     @commands.command(name="kick")
     @commands.has_permissions(kick_members=True)
     async def kick(
