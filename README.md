@@ -33,7 +33,7 @@ More features will be added into the roadmap once the ideas start flowing in.
 - [ ] Moderation *
   - [ ] Typical Moderation Commands (ban, kick, timeout etc...) *
   - [ ] Jail
-  - [ ] FakePerms w/ Dashboard *
+  - [x] FakePerms w/ Dashboard (dashboard incomplete)
   - [ ] Other things I will think about
 - [ ] Games *
   - [x] Counter
