@@ -15,7 +15,7 @@ This is a bot I started purely for fun. The bot is fully coded in python with an
 ## Requirements
 
 - Python 3.11 or higher
-- ~~Lavalink 4 (**You can use a server instead of using a local server**)~~ **Work in progress feture
+- ~~Lavalink 4 (**You can use a server instead of using a local server**)~~ **Work in progress feature
 
 ## Setup
 
