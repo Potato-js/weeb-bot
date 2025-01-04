@@ -55,6 +55,7 @@ More features will be added into the roadmap once the ideas start flowing in.
   - [ ] I dunno we'll see :)
 
 (*) In progress
+
 (**) Possible Addition it can be removed at anytime
 
 ## License
