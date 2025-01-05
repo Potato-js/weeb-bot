@@ -1,5 +1,7 @@
-from flask import Flask, render_template, redirect, url_for
-from flask_discord import DiscordOAuth2Session
+import jwt
+
+from flask import Flask, render_template, redirect, url_for, request, jsonify
+from flask_discord import DiscordOAuth2Session, Unauthorized
 from os import getenv
 
 
@@ -32,7 +34,27 @@ def create_app():
 
     @app.route("/callback/")
     def callback():
-        discord.callback()
+        # Validate the 'state' parameter
+        state = request.args.get("state")
+        if not state:
+            return jsonify({"error": "Missing 'state' parameter"}), 400
+
+        # Validate the JWT format of the 'state' parameter
+        try:
+            if len(state.split(".")) != 3:
+                raise ValueError("Malformed JWT token.")
+            decoded_state = jwt.decode(
+                state, app.secret_key, algorithms=["HS256"]
+            )  # Ensure the key and algorithm match
+        except (jwt.DecodeError, ValueError) as e:
+            return jsonify({"error": f"Invalid JWT token: {str(e)}"}), 400
+
+        # Continue with Discord callback
+        try:
+            discord.callback()
+        except Unauthorized:
+            return jsonify({"error": "Unauthorized access."}), 403
+
         return redirect(url_for("dashboard"))
 
     @app.route("/dashboard/")
