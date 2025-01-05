@@ -1,18 +1,27 @@
 import jwt
 
-from flask import Flask, render_template, redirect, url_for, request, jsonify
+from datetime import timedelta
+from flask import Flask, render_template, redirect, url_for, request, jsonify, session
 from flask_discord import DiscordOAuth2Session, Unauthorized
+from flask_session import Session
 from os import getenv
 
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = getenv("FLASK_SECRET_KEY")
+    app.secret_key = getenv("FLASK_SECRET_KEY", "APP_SECRET_KEY")
 
     CLIENT_ID = getenv("DISCORD_CLIENT_ID")
     CLIENT_SECRET = getenv("DISCORD_CLIENT_SECRET")
     TOKEN = getenv("TOKEN")
     REDIRECT_URI = getenv("DISCORD_REDIRECT_URI")
+
+    # Flask-Session Storing
+    app.config["SESSION_TYPE"] = "filesystem"
+    app.config["SESSION_FILE_DIR"] = "/tmp/flask_session"
+    app.config["SESSION_PERMANENT"] = True
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
+    Session(app)
 
     # Discord OAuth Config
     app.config["DISCORD_CLIENT_ID"] = CLIENT_ID
@@ -55,16 +64,23 @@ def create_app():
         except Unauthorized:
             return jsonify({"error": "Unauthorized access."}), 403
 
+        # Fetch user data
+        user = discord.fetch_user()
+        session["user"] = {"id": user.id, "name": user.name, "avatar": user.avatar_url}
+
         return redirect(url_for("dashboard"))
+
+    @app.route("/session_data/")
+    def session_data():
+        return jsonify(session)
 
     @app.route("/dashboard/")
     def dashboard():
         if not discord.authorized:
             return redirect(url_for("login"))
 
-        user = discord.fetch_user()
+        user = session.get("user")
         guilds = discord.fetch_guilds()
-
         admin_guild = [guild for guild in guilds if guild.permissions.administrator]
 
         return render_template("dashboard.html", user=user, guilds=admin_guild)
@@ -72,6 +88,7 @@ def create_app():
     @app.route("/logout/")
     def logout():
         discord.revoke()
+        session.clear()
         return redirect(url_for("home"))
 
     return app

@@ -3,3 +3,4 @@ python-dotenv
 wavelink
 flask
 flask-discord
+flask_session
