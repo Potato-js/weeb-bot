@@ -25,7 +25,7 @@ This is a bot I started purely for fun. The bot is fully coded in python with an
 
 ## Roadmap
 
-More features will be added into the roadmap once the ideas start flowing in.
+More features will be added into the roadmap once the ideas start flowing in. (Yes I know very ambitious)
 
 - [ ] Leveling System
   - [ ] Basic XP system
@@ -51,6 +51,7 @@ More features will be added into the roadmap once the ideas start flowing in.
   - [ ] Valorant (limited to only player stats)
   - [ ] Hypixel
   - [ ] Roblox
+  - [ ] Fortnite **
 - [ ] Utilites
   - [ ] I dunno we'll see :)
 
