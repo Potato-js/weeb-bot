@@ -1,4 +1,4 @@
-# weeb-bot
+# weeb-bot-saucy
   
 ![image](assets/static.png)
 
@@ -23,7 +23,7 @@ This is a bot I started purely for fun. The bot is fully coded in python with an
 2. Install all dependancies using `pip install -r requirements.txt` or `pip3 install -r requirements.txt`
 3. Once installed all the dependancies run `python main.py` or `python3 main.py` ~~and `python dashboard.py` or `python3 dashboard.py` to run the dashboard if you are using any leveling modules or fake perms.~~ **WORK IN PROGRESS FEATURE**
 
-## Roadmap
+## Roadmap (FOR MAIN BRANCH)
 
 More features will be added into the roadmap once the ideas start flowing in. (Yes I know very ambitious)
 
