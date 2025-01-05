@@ -74,6 +74,10 @@ def create_app():
     def session_data():
         return jsonify(session)
 
+    @app.route("/manage/<guild_id>")
+    def manage_guild(guild_id):
+        return f"Manage guild {guild_id}"
+
     @app.route("/dashboard/")
     def dashboard():
         if not discord.authorized:
