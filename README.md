@@ -21,7 +21,7 @@ This is a bot I started purely for fun. The bot is fully coded in python with an
 
 1. Create a `.env` file and refer to the `.env.example` for all environment variables
 2. Install all dependancies using `pip install -r requirements.txt` or `pip3 install -r requirements.txt`
-3. Once installed all the dependancies run `python main.py` or `python3 main.py` ~~and `python dashboard.py` or `python3 dashboard.py` to run the dashboard if you are using any leveling modules or fake perms.~~ **WORK IN PROGRESS FEATURE**
+3. Once installed all the dependancies run `python main.py` or `python3 main.py` ~~and `python dashboard.py` or `python3 dashboard.py` to run the dashboard if you are using any leveling modules or fake perms.~~ **If you want to use the dashboard refer to the [experimental-branch](https://github.com/Potato-js/weeb-bot/tree/experimental-dashboard)**
 
 ## Roadmap
 
