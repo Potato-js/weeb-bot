@@ -13,7 +13,7 @@ class Moderation(commands.Cog):
     # TODO: Make this work with fakeperms
     @commands.command(name="kick")
     @commands.has_permissions(kick_members=True)
-    async def kick(
+    async def moderator_kick(
         self,
         ctx,
         member: discord.Member,
@@ -27,6 +27,17 @@ class Moderation(commands.Cog):
             color=discord.Color.red(),
         )
         await ctx.send(embed=kick_embed)
+
+    @commands.command(name="ban")
+    @commands.has_permissions(ban_members=True)
+    async def moderator_ban(self, ctx, member: discord.Member, *, reason: Optional[str] = "No reason provided."):
+        await member.ban(reason=reason)
+        ban_embed = EmbedUtils.create_embed(
+            title="Member Banned",
+            description=f"{member.mention} has been kicked for *{reason}*",
+            color=discord.Color.red(),
+        )
+        await ctx.send(embed=ban_embed)
 
 
 async def setup(bot):
