@@ -130,6 +130,7 @@ ENV/
 env.bak/
 venv.bak/
 databases
+flask_session
 
 # Spyder project settings
 .spyderproject
