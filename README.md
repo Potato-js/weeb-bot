@@ -4,10 +4,6 @@
 
 A Free and Open-Source Discord Bot with Premium and Advanced Features with a local dashboard
 
-## NOTE: The dashboard is STILL a WIP DO NOT USE IT
-
-Since I'm still working on how the dashboard will work right now it's just a rough login page with servers you are in.
-
 ## About
 
 This is a bot I started purely for fun. The bot is fully coded in python with an added dashboard coded in Discord Flask. If you have any features or any bugs check the issue template. More features will be added soon! Check the roadmap on what I'm planning to add.
@@ -30,10 +26,10 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
 - [ ] Leveling System
   - [ ] Basic XP system
   - [ ] Add A Dashboard for editing EVERYTHING + the commands to start with **
-- [ ] Moderation *
+- [ ] Moderation
   - [ ] Typical Moderation Commands (ban, kick, timeout etc...) *
   - [ ] Jail
-  - [x] FakePerms w/ Dashboard (dashboard incomplete)
+  - [ ] FakePerms *
   - [ ] Other things I will think about
 - [ ] Games *
   - [x] Counter
