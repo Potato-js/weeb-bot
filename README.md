@@ -11,13 +11,13 @@ This is a bot I started purely for fun. The bot is fully coded in python with an
 ## Requirements
 
 - Python 3.11 or higher
-- ~~Lavalink 4 (**You can use a server instead of using a local server**)~~ **Work in progress feature
+- Lavalink 4 (**You can use a server instead of using a local server, But make sure the server has LavaSrc for Spotify Support.**)
 
 ## Setup
 
 1. Create a `.env` file and refer to the `.env.example` for all environment variables
 2. Install all dependancies using `pip install -r requirements.txt` or `pip3 install -r requirements.txt`
-3. Once installed all the dependancies run `python main.py` or `python3 main.py` ~~and `python dashboard.py` or `python3 dashboard.py` to run the dashboard if you are using any leveling modules or fake perms.~~ **If you want to use the dashboard refer to the [experimental-branch](https://github.com/Potato-js/weeb-bot/tree/experimental-dashboard)**
+3. Once installed all the dependancies run `python main.py` or `python3 main.py`
 
 ## Roadmap
 
@@ -42,7 +42,8 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
   - [ ] Begging
 - [ ] Music *
   - [ ] Lyrics
-  - [ ] Spotify Support
+  - [x] Spotify Support
+  - [ ] Interactive UI **
 - [ ] Statistics on some games **
   - [ ] Valorant (limited to only player stats)
   - [ ] Hypixel
