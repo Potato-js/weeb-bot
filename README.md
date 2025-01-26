@@ -49,6 +49,8 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
   - [ ] Hypixel
   - [ ] Roblox
   - [ ] Fortnite **
+  - [ ] osu
+- [ ] Anime Searcher **
 - [ ] Utilites
   - [ ] I dunno we'll see :)
 
