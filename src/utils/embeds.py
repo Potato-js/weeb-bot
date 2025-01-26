@@ -11,7 +11,7 @@ class EmbedUtils:
     def create_embed(
         description: str,
         title: Optional[str] = None,
-        color: discord.Color = discord.Color.blue(),
+        color: discord.Color = discord.Color.random(),
         fields: Optional[List[dict]] = None,
         footer: Optional[str] = "© 2025 weeaboo",
         thumbnail_url: Optional[str] = None,
