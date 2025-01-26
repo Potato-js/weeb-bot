@@ -40,7 +40,7 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
   - [ ] Bank Accounts
   - [ ] Gambling 🎰
   - [ ] Begging
-- [ ] Music **
+- [ ] Music *
   - [ ] Lyrics
   - [ ] Spotify Support
 - [ ] Statistics on some games **
@@ -53,7 +53,7 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
 
 (*) In progress
 
-(**) Possible Addition it can be removed at anytime
+(**) Can be removed
 
 ## License
 
