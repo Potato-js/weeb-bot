@@ -8,9 +8,7 @@ from src.cogs.fakeperms import FakePerms
 from src.utils.embeds import EmbedUtils
 
 
-class TestFakePerms(
-    unittest.IsolatedAsyncioTestCase
-):  # TODO: finish this unit test up :L
+class TestFakePerms(unittest.IsolatedAsyncioTestCase):  # TODO: finish this unit test up
     async def asyncSetUp(self):
         self.bot = commands.Bot(command_prefix="!", intents=Intents.all())
         self.fakeperms = FakePerms(self.bot)
