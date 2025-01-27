@@ -72,7 +72,7 @@ class Moderation(commands.Cog):
         )
         await ctx.send(embed=ban_embed)
 
-    @commands.hybrid_command(name="unban")
+    @commands.hybrid_command(name="unban")  # TODO: complete this command
     @check_perms("ban_members")
     async def moderator_unban(self, ctx, *, user_id: int):
         pass
