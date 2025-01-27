@@ -50,6 +50,7 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
     - [ ] Skywars Stats
     - [ ] Skyblock Stats
   - [ ] osu
+    - [ ] Last Play
 - [ ] Anime Searcher **
 - [ ] Utilites
   - [ ] Giveaway system
