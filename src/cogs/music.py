@@ -198,7 +198,7 @@ class Music(commands.Cog):
         await ctx.message.add_reaction("👋")
 
     @commands.hybrid_command(name="loop", aliases=["repeat", "l"])
-    async def music_loop_track(self, ctx):
+    async def music_loop_track(self, ctx: commands.Context):
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             return
@@ -216,6 +216,15 @@ class Music(commands.Cog):
                     description="🔂 | Loop mode disabled"
                 )
                 await ctx.send(embed=loop_embed)
+
+    @commands.hybrid_command(name="shuffle", aliases=["sh"])
+    async def music_shuffle_queue(self, ctx):
+        player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            return
+
+        await player.queue.shuffle()
+        await ctx.message.add_reaction("🔀")
 
 
 async def setup(bot):

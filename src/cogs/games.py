@@ -60,16 +60,21 @@ class Games(commands.Cog):
                     conn.commit()
                     await message.add_reaction("✅")
                 else:
-                    await message.channel.send(
-                        f"Incorrect Number! The last correct number was {current_count}. Resetting back to 1."
+                    wrong_number_em = EmbedUtils.create_embed(
+                        title="Wrong Number!",
+                        description=f"❌ | Wrong Number! The last correct number was {current_count}. Resetting back to 1.",
                     )
+                    await message.channel.send(embed=wrong_number_em)
                     cursor.execute(
                         "UPDATE counting_channels SET count = 1 WHERE channel_id = ?",
                         (channel_id,),
                     )
                     conn.commit()
             except ValueError:
-                await message.channel.send("Please enter a valid number!")
+                invalid_int_embed = EmbedUtils.warning_embed(
+                    "❗ | Please enter a valid number!"
+                )
+                await message.channel.send(embed=invalid_int_embed)
         else:
             # Ignore messages in non-counting channels
             pass
