@@ -46,8 +46,9 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
 - [ ] Statistics on some games **
   - [ ] Valorant (limited to only player stats)
   - [ ] Hypixel
-  - [ ] Roblox
-  - [ ] Fortnite **
+    - [ ] Bedwars Stats
+    - [ ] Skywars Stats
+    - [ ] Skyblock Stats
   - [ ] osu
 - [ ] Anime Searcher **
 - [ ] Utilites
