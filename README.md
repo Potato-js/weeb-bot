@@ -25,7 +25,6 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
 
 - [ ] Leveling System
   - [ ] Basic XP system
-  - [ ] Add A Dashboard for editing EVERYTHING + the commands to start with **
 - [ ] Moderation
   - [ ] Typical Moderation Commands (ban, kick, timeout etc...) *
   - [ ] Jail
@@ -47,12 +46,15 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
 - [ ] Statistics on some games **
   - [ ] Valorant (limited to only player stats)
   - [ ] Hypixel
-  - [ ] Roblox
-  - [ ] Fortnite **
+    - [ ] Bedwars Stats
+    - [ ] Skywars Stats
+    - [ ] Skyblock Stats
   - [ ] osu
+    - [ ] Last Play
 - [ ] Anime Searcher **
 - [ ] Utilites
-  - [ ] I dunno we'll see :)
+  - [ ] Giveaway system
+  - [ ] Ticket System
 
 (*) In progress
 
