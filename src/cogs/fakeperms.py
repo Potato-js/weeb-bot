@@ -11,7 +11,7 @@ logger = setup_logger()
 
 
 class FakePerms(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.db_path = "./src/databases/fakeperms.db"
         self.permission_file = "./json/permissions.json"

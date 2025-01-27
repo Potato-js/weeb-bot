@@ -10,7 +10,7 @@ logger = setup_logger()
 
 
 class Games(commands.Cog):
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
     @commands.Cog.listener()

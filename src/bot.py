@@ -2,11 +2,15 @@ import discord
 import os
 
 from discord.ext import commands
+from dotenv import load_dotenv
 from src.utils.logger import setup_logger
+
+load_dotenv()
+PREFIX = os.getenv("PREFIX")
 
 logger = setup_logger()
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 
 async def load_cogs():
