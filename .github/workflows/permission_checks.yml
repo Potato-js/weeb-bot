@@ -5,35 +5,33 @@ on:
     branches:
       - main
       - development-branch
-    pull_request:
-      branches:
-        - main
-        - development-branch
+  pull_request:
+    branches:
+      - main
+      - development-branch
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-    # Get Repository
-    - name: Checkout Code
-      uses: actions/checkout@v4.2.2
+      # Get Repository
+      - name: Checkout Code
+        uses: actions/checkout@v4.2.2
 
-    # Install python
-    - name: Setup Python
-      uses: actions/setup-python@v5.3.0
-      with:
-        python-version: "3.11.3"
+      # Install python
+      - name: Setup Python
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: "3.11.3"
 
-    # Install dependencies
-    - name: Install dependencies
-      run: |
+      # Install dependencies
+      - name: Install dependencies
+        run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-    # Run Check Test
-    - name: Run check_perms test
-      run: |
-        python -m unittest tests/tests_checks.py
-
-      
+      # Run Check Test
+      - name: Run check_perms test
+        run: |
+          python -m unittest tests/tests_checks.py
