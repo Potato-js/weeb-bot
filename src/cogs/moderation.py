@@ -38,14 +38,6 @@ class Moderation(commands.Cog):
         *,
         reason: Optional[str] = "No reason provided.",
     ):
-        if not (
-            ctx.author.guild_permissions.kick_members
-            or self.has_fake_perms(ctx, "KICK_MEMBERS")
-        ):
-            kick_embed = EmbedUtils.error_embed(
-                "⛔ | You do not have permission to kick members."
-            )
-            return await ctx.send(embed=kick_embed)
 
         await member.kick(reason=reason)
         kick_embed = EmbedUtils.create_embed(

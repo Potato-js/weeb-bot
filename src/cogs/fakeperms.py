@@ -84,14 +84,14 @@ class FakePerms(commands.Cog):
         finally:
             conn.close()
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        """
-        Handle errors gracefully, particularly for permission checks.
-        """
-        if isinstance(error, commands.CheckFailure):
-            embed = EmbedUtils.user_invalid_permissions()
-            await ctx.send(embed=embed)
+    # @commands.Cog.listener()
+    # async def on_command_error(self, ctx, error):
+    #     """
+    #     Handle errors gracefully, particularly for permission checks.
+    #     """
+    #     if isinstance(error, commands.CheckFailure):
+    #         embed = EmbedUtils.user_invalid_permissions()
+    #         await ctx.send(embed=embed)
 
     @commands.hybrid_group(
         name="fakeperms",
