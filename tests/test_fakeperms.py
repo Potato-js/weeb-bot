@@ -8,7 +8,9 @@ from src.cogs.fakeperms import FakePerms
 from src.utils.embeds import EmbedUtils
 
 
-class TestFakePerms(unittest.IsolatedAsyncioTestCase): # TODO: finish this unit test up :L
+class TestFakePerms(
+    unittest.IsolatedAsyncioTestCase
+):  # TODO: finish this unit test up :L
     async def asyncSetUp(self):
         self.bot = commands.Bot(command_prefix="!", intents=Intents.all())
         self.fakeperms = FakePerms(self.bot)
@@ -35,4 +37,5 @@ class TestFakePerms(unittest.IsolatedAsyncioTestCase): # TODO: finish this unit 
         self.ctx.send = AsyncMock()
 
     @patch("src.utils.checks.check_perms")
-    async def test_kick_with_decorator_allow(self, mock_check_perms)
+    async def test_kick_with_decorator_allow(self, mock_check_perms):
+        pass
