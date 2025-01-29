@@ -6,7 +6,6 @@ from discord.ext import commands
 from src.utils.logger import setup_logger
 from src.utils.embeds import EmbedUtils
 from src.utils.checks import is_server_owner
-from typing import Optional
 
 logger = setup_logger()
 
