@@ -3,10 +3,11 @@ name: PEP 8 Compliance Check
 on:
   push:
     branches:
-      - main # Trigger on pushes to the main branch
+      - main
+      - development-branch
   pull_request:
     branches:
-      - main # Trigger on pull requests targeting the main branch
+      - main
 
 jobs:
   pep8-check:
@@ -19,7 +20,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11" # Use the latest Python 3.x version
+          python-version: "3.11"
 
       - name: Install flake8
         run: |
