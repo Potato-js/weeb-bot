@@ -60,6 +60,10 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
 
 (**) Can be removed
 
+## Attributions
+
+Used [Red-DiscordBot](https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/.github/workflows/lint_python.yaml) python linter
+
 ## License
 
 All code is provided under the MIT License. You are fully responsible for any changes, usage, and/or edits made to the code. I assume no liability for any consequesnces resulting from its use.

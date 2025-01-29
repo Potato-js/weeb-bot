@@ -121,11 +121,11 @@ class EmbedUtils:
             description=description, title=title, color=discord.Color.yellow()
         )
 
-    @staticmethod
-    def user_invalid_permissions():
-        return EmbedUtils.warning_embed(
-            description="⚠ | You do not have the required permissions to run this command."
-        )
+    # @staticmethod
+    # def user_invalid_permissions():
+    #     return EmbedUtils.warning_embed(
+    #         description="⚠ | You do not have the required permissions to run this command."
+    #     )
 
     @staticmethod
     def bot_invalid_permissions():
