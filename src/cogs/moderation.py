@@ -82,7 +82,7 @@ class Moderation(commands.Cog):
         ban_embed = EmbedUtils.create_embed(
             title="Member Banned",
             description=f"""
-            🔨 | {member.mention} has been banned for *{reason}* for **{duration}**
+            🔨 | {member.mention} has been banned for *{reason}* for {duration}
             """,
             color=discord.Color.green(),
         )

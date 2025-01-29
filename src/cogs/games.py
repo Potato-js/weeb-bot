@@ -62,7 +62,9 @@ class Games(commands.Cog):
                 else:
                     wrong_number_em = EmbedUtils.create_embed(
                         title="Wrong Number!",
-                        description=f"❌ | Wrong Number! The last correct number was {current_count}. Resetting back to 1.",
+                        description=f"""
+                        ❌ | Wrong Number! The last correct number was {current_count}. Resetting back to 1.
+                        """,
                     )
                     await message.channel.send(embed=wrong_number_em)
                     cursor.execute(
