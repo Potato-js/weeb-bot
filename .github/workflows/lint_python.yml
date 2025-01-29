@@ -3,11 +3,12 @@ name: PEP 8 Compliance Check
 on:
   push:
     branches:
-      - main
+      - master
       - development-branch
   pull_request:
     branches:
-      - main
+      - master
+      - development-branch
 
 jobs:
   pep8-check:
