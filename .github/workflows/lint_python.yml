@@ -33,11 +33,11 @@ jobs:
       - name: Run flake8 and capture output
         id: flake8
         run: |
-          output=$(flake8 . --count --show-source --statistics)
+          output=$(flake8 . --count --show-source --statistics || true)
           echo "flake8_output<<EOF" >> $GITHUB_OUTPUT
           echo "$output" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-          if [ -n "$output" ]; then
+          if [ -n "$output" ] && [ "$output" != "0" ]; then
             echo "PEP 8 violations found"
             exit 1
           else
