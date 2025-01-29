@@ -1,5 +1,8 @@
 import asyncio
 
+from datetime import timedelta
+from typing import Optional
+
 import discord
 
 from discord.ext import commands
@@ -7,7 +10,6 @@ from src.utils.logger import setup_logger
 from src.utils.embeds import EmbedUtils
 from src.utils.checks import check_perms
 from src.utils.utils import parse_duration
-from typing import Optional, List, Required
 
 logger = setup_logger()
 
@@ -22,13 +24,17 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             missing_perms = ", ".join(error.missing_permissions)
             missing_perms_embed = EmbedUtils.error_embed(
-                description=f"⛔ | You do not have permission to {missing_perms}",
+                description=f"""
+                ⛔ | You do not have permission to {missing_perms}
+                """,
                 title="Invalid Permissions",
             )
             await ctx.send(embed=missing_perms_embed)
         elif isinstance(error, commands.CheckFailure):
             missing_perms_embed = EmbedUtils.error_embed(
-                description=f"⛔ | You do not have permission to run this command!",
+                description="""
+                ⛔ | You do not have permission to run this command!
+                """,
                 title="Invalid Permissions",
             )
             await ctx.send(embed=missing_perms_embed)
@@ -48,7 +54,7 @@ class Moderation(commands.Cog):
         await member.kick(reason=reason)
         kick_embed = EmbedUtils.create_embed(
             title="Member Kicked",
-            description=f"🥾 | {member.mention} has been kicked from the server for *{reason}*.",
+            description=f"🥾 | {member.mention} has been kicked for *{reason}*",
             color=discord.Color.green(),
         )
         await ctx.send(embed=kick_embed)
@@ -75,7 +81,9 @@ class Moderation(commands.Cog):
         await member.ban(reason=reason, delete_message_days=7)
         ban_embed = EmbedUtils.create_embed(
             title="Member Banned",
-            description=f"🔨 | {member.mention} has been kicked for *{reason}* for **{duration}**",
+            description=f"""
+            🔨 | {member.mention} has been banned for *{reason}* for **{duration}**
+            """,
             color=discord.Color.green(),
         )
         await ctx.send(embed=ban_embed)
@@ -104,6 +112,46 @@ class Moderation(commands.Cog):
             color=discord.Color.green(),
         )
         await ctx.send(embed=unban_embed)
+
+    @commands.hybrid_command(name="mute", aliases=["timeout"])
+    @check_perms("moderate_members")
+    async def moderator_mute_or_timeout(
+        self,
+        ctx: commands.Context,
+        user: discord.Member,
+        duration: Optional[str] = "3h",
+        *,
+        reason: Optional[str] = "No reason provided",
+    ):
+        seconds = parse_duration(duration)
+        if seconds > 2419200:
+            toolong_embed = EmbedUtils.warning_embed(
+                "❗ | The timeout duration must be less than 28 days!"
+            )
+            await ctx.send(embed=toolong_embed)
+
+        await user.timeout(timedelta(seconds=seconds), reason=reason)
+        timeout_embed = EmbedUtils.create_embed(
+            title="Timed out user",
+            description=f"🔇 | Timed out {user.mention} for {duration}",
+            color=discord.Color.green(),
+        )
+        await ctx.send(embed=timeout_embed)
+
+    @commands.hybrid_command(name="unmute", aliases=["untimout"])
+    @check_perms("moderate_members")
+    async def moderator_unmute_or_untimeout(
+        self,
+        ctx: commands.Context,
+        user: discord.Member,
+    ):
+        await user.timeout(None)
+        timeout_embed = EmbedUtils.create_embed(
+            title="Time out removed",
+            description=f"🔇 | Removed timeout for {user.mention}",
+            color=discord.Color.green(),
+        )
+        await ctx.send(embed=timeout_embed)
 
 
 async def setup(bot):
