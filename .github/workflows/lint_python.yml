@@ -1,10 +1,12 @@
 name: PEP 8 Compliance Check
 
 on:
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
-      - development-branch
 
 jobs:
   pep8-check:
@@ -24,6 +26,37 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8
 
-      - name: Run flake8
+      - name: Run flake8 and capture output
+        id: flake8
         run: |
-          flake8 . --count --show-source --statistics
+          output=$(flake8 . --count --show-source --statistics)
+          echo "flake8_output<<EOF" >> $GITHUB_OUTPUT
+          echo "$output" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          if [ -n "$output" ]; then
+            echo "PEP 8 violations found"
+            exit 1
+          else
+            echo "No PEP 8 violations found"
+          fi
+
+      - name: Comment on pull request if flake8 fails
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const output = `### ⚠️ PEP 8 Compliance Check Failed
+            **Details:**
+            \`\`\`
+            ${process.env.FLAKE8_OUTPUT}
+            \`\`\`
+            Please fix the issues and update the pull request.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
+        env:
+          FLAKE8_OUTPUT: ${{ steps.flake8.outputs.flake8_output }}
