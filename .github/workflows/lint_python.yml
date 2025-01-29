@@ -1,7 +1,6 @@
 name: PEP 8 Compliance Check
 
 on:
-  push:
   pull_request:
     branches:
       - master
