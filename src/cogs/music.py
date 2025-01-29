@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from os import getenv
 from src.utils.embeds import EmbedUtils
 from src.utils.logger import setup_logger
-from typing import Optional, cast
+from typing import cast
 
 logger = setup_logger()
 

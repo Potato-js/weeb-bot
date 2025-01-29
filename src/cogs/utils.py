@@ -1,7 +1,8 @@
 # import discord
 
 from discord.ext import commands
-from typing import Required, Optional
+
+# from typing import Required, Optional
 
 
 class Utils(commands.Cog):
