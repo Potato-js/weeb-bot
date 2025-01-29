@@ -8,6 +8,10 @@ on:
     branches:
       - master
 
+permissions:
+  pull-requests: write
+  contents: read
+
 jobs:
   pep8-check:
     runs-on: ubuntu-latest
