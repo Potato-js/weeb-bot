@@ -1,5 +1,7 @@
 import asyncio
 
+from typing import cast
+
 import discord
 import wavelink
 
@@ -9,7 +11,8 @@ from dotenv import load_dotenv
 from os import getenv
 from src.utils.embeds import EmbedUtils
 from src.utils.logger import setup_logger
-from typing import cast
+from src.utils.errors import PlayerIsNotAvailable
+
 
 logger = setup_logger()
 
@@ -30,6 +33,14 @@ class Music(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.setup_hook()
+
+    @commands.Cog.listener()
+    async def on_command_error(
+        self, ctx: commands.Context, error: commands.CommandError
+    ):
+        if isinstance(error, PlayerIsNotAvailable):
+            err_embed = EmbedUtils.error_embed(error)
+            await ctx.send(embed=err_embed)
 
     @commands.Cog.listener()
     async def on_wavelink_node_ready(
@@ -151,7 +162,7 @@ class Music(commands.Cog):
         """ "Skips the current song"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
-            return
+            raise PlayerIsNotAvailable()
 
         await player.skip()
         await ctx.message.add_reaction("✅")
@@ -161,7 +172,7 @@ class Music(commands.Cog):
         """Pause or Resume the player depending on its state"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
-            return
+            raise PlayerIsNotAvailable()
 
         await player.pause(not player.paused)
         await ctx.message.add_reaction("✅")
@@ -170,7 +181,7 @@ class Music(commands.Cog):
     async def music_volume(self, ctx, value: int):
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
-            return
+            raise PlayerIsNotAvailable()
 
         if value > 100:
             tooloud_em = EmbedUtils.warning_embed(
@@ -192,16 +203,17 @@ class Music(commands.Cog):
     async def music_disconnect(self, ctx):
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
-            return
+            raise PlayerIsNotAvailable()
 
         await player.disconnect()
-        await ctx.message.add_reaction("👋")
+        dc_embed = EmbedUtils.success_embed("👋 | See you next time!")
+        await ctx.send(embed=dc_embed)
 
     @commands.hybrid_command(name="loop", aliases=["repeat", "l"])
     async def music_loop_track(self, ctx: commands.Context):
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
-            return
+            raise PlayerIsNotAvailable()
 
         if player.current:
             if player.queue.mode == wavelink.QueueMode.normal:
@@ -221,10 +233,14 @@ class Music(commands.Cog):
     async def music_shuffle_queue(self, ctx):
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
-            return
+            raise PlayerIsNotAvailable()
 
         await player.queue.shuffle()
-        await ctx.message.add_reaction("🔀")
+        shuffle_embed = EmbedUtils.success_embed(
+            description=f"🔀 | Shuffling the queue of **{len(player.queue.count)} songs**",
+            title="Shuffling...",
+        )
+        await ctx.send(embed=shuffle_embed)
 
 
 async def setup(bot):
