@@ -7,6 +7,18 @@ class WeeabooError(commands.CommandError):
     pass
 
 
+class MissingParameter(WeeabooError):
+    """Raised when there is a missing parameter"""
+
+    pass
+
+
+class InvalidParameter(WeeabooError):
+    """Raised when there is a missing parameter"""
+
+    pass
+
+
 class PlayerIsNotAvailable(WeeabooError):
     """Raised when the Lavalink Player is Not connected to a Voice Channel"""
 

@@ -124,7 +124,10 @@ class FakePerms(commands.Cog):
         await ctx.send(embed=embed)
 
     @mod_fakeperms.command(name="revoke", help="Revoke a permission from a role.")
-    async def fp_revoke_permission(self, ctx, role: discord.Role, perm_name: str):
+    async def fp_revoke_permission(self, ctx, role: discord.Role, *, perm_name: str):
+        if role is None:
+            return
+
         perm_flag = self.permission_flags.get(perm_name.upper())
         if not perm_flag:
             embed = EmbedUtils.error_embed(
