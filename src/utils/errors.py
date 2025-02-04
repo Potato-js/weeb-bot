@@ -10,7 +10,13 @@ class WeeabooError(commands.CommandError):
 class MissingParameter(WeeabooError):
     """Raised when there is a missing parameter"""
 
-    pass
+    def __init__(self, parameter_name: str, message: str = None):
+        self.parameter_name = parameter_name
+
+        if message is None:
+            message = f"Missing required parameter: {parameter_name}"
+
+        super().__init__(message)
 
 
 class InvalidParameter(WeeabooError):

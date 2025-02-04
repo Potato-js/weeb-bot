@@ -1,4 +1,7 @@
 # weeb-bot
+
+![GitHub License](https://img.shields.io/github/license/Potato-js/weeb-bot)
+![GitHub Release](https://img.shields.io/github/v/release/Potato-js/weeb-bot)
   
 ![image](assets/static.png)
 
@@ -51,13 +54,13 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
     - [ ] Skyblock Stats
   - [ ] osu
     - [ ] Last Play
-- [ ] Anime Searcher **
+- [ ] Anime Searcher (via MyAnimeList) **
 - [ ] Utilites
   - [ ] Giveaway system
   - [ ] Ticket System
+- [ ] 🔞 Commands **
 
 (*) In progress
-
 (**) Can be removed
 
 ## Attributions
