@@ -14,6 +14,7 @@ This is a bot I started purely for fun. The bot is fully coded in python with an
 ## Requirements
 
 - Python 3.11 or higher
+- SQLite3
 - Lavalink 4 (**You can use a server instead of using a local server, But make sure the server has LavaSrc for Spotify Support.**)
 
 ## Setup
@@ -59,6 +60,7 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
   - [ ] Giveaway system
   - [ ] Ticket System
 - [ ] 🔞 Commands **
+- [ ] Join To Create (via. VoiceMaster)
 
 (*) In progress
 (**) Can be removed

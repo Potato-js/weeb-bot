@@ -6,7 +6,6 @@ from discord.ext import commands
 from src.utils.logger import setup_logger
 from src.utils.embeds import EmbedUtils
 from src.utils.checks import is_server_owner
-from src.utils.errors import MissingParameter
 
 logger = setup_logger()
 
@@ -89,12 +88,13 @@ class FakePerms(commands.Cog):
     async def on_command_error(
         self, ctx: commands.Context, error: commands.CommandError
     ):
-        if isinstance(error, MissingParameter):  # TODO: Fix this not printing
-            missing_param = error.parameter_name
-            error_embed = EmbedUtils.error_embed(
-                f"⛔ | Missing parameter: **{missing_param}**"
+        if isinstance(error, commands.MissingRequiredArgument):
+            param = error.param
+            await ctx.send(
+                embed=EmbedUtils.error_embed(
+                    f"⛔ | Missing required parameter: `{param.name}`"
+                )
             )
-            await ctx.send(embed=error_embed)
 
     @commands.hybrid_group(
         name="fakeperms",
@@ -128,9 +128,6 @@ class FakePerms(commands.Cog):
 
     @mod_fakeperms.command(name="revoke", help="Revoke a permission from a role.")
     async def fp_revoke_permission(self, ctx, role: discord.Role, *, perm_name: str):
-        if role is None:
-            raise MissingParameter(role)
-
         perm_flag = self.permission_flags.get(perm_name.upper())
         if not perm_flag:
             embed = EmbedUtils.error_embed(

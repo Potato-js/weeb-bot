@@ -92,7 +92,7 @@ class Music(commands.Cog):
             new = await player.queue.get_wait()
             await player.play(new)
         else:
-            asyncio.sleep(120)
+            await asyncio.sleep(120)
             await player.stop()
             await player.disconnect()
 
@@ -237,7 +237,7 @@ class Music(commands.Cog):
 
         await player.queue.shuffle()
         shuffle_embed = EmbedUtils.success_embed(
-            description=f"🔀 | Shuffling the queue of **{len(player.queue.count)} songs**",
+            description=f"🔀 | Shuffling the queue of **{len(player.queue)} songs**",
             title="Shuffling...",
         )
         await ctx.send(embed=shuffle_embed)
