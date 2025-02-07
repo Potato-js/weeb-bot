@@ -1,4 +1,7 @@
 # weeb-bot
+
+![GitHub License](https://img.shields.io/github/license/Potato-js/weeb-bot)
+![GitHub Release](https://img.shields.io/github/v/release/Potato-js/weeb-bot)
   
 ![image](assets/static.png)
 
@@ -11,6 +14,7 @@ This is a bot I started purely for fun. The bot is fully coded in python with an
 ## Requirements
 
 - Python 3.11 or higher
+- SQLite3
 - Lavalink 4 (**You can use a server instead of using a local server, But make sure the server has LavaSrc for Spotify Support.**)
 
 ## Setup
@@ -51,13 +55,14 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
     - [ ] Skyblock Stats
   - [ ] osu
     - [ ] Last Play
-- [ ] Anime Searcher **
+- [ ] Anime Searcher (via MyAnimeList) **
 - [ ] Utilites
   - [ ] Giveaway system
   - [ ] Ticket System
+- [ ] 🔞 Commands **
+- [ ] Join To Create (via. VoiceMaster)
 
 (*) In progress
-
 (**) Can be removed
 
 ## Attributions

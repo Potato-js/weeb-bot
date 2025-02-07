@@ -84,14 +84,17 @@ class FakePerms(commands.Cog):
         finally:
             conn.close()
 
-    # @commands.Cog.listener()
-    # async def on_command_error(self, ctx, error):
-    #     """
-    #     Handle errors gracefully, particularly for permission checks.
-    #     """
-    #     if isinstance(error, commands.CheckFailure):
-    #         embed = EmbedUtils.user_invalid_permissions()
-    #         await ctx.send(embed=embed)
+    @commands.Cog.listener()
+    async def on_command_error(
+        self, ctx: commands.Context, error: commands.CommandError
+    ):
+        if isinstance(error, commands.MissingRequiredArgument):
+            param = error.param
+            await ctx.send(
+                embed=EmbedUtils.error_embed(
+                    f"⛔ | Missing required parameter: `{param.name}`"
+                )
+            )
 
     @commands.hybrid_group(
         name="fakeperms",
@@ -124,7 +127,7 @@ class FakePerms(commands.Cog):
         await ctx.send(embed=embed)
 
     @mod_fakeperms.command(name="revoke", help="Revoke a permission from a role.")
-    async def fp_revoke_permission(self, ctx, role: discord.Role, perm_name: str):
+    async def fp_revoke_permission(self, ctx, role: discord.Role, *, perm_name: str):
         perm_flag = self.permission_flags.get(perm_name.upper())
         if not perm_flag:
             embed = EmbedUtils.error_embed(

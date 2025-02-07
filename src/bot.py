@@ -7,6 +7,7 @@ from src.utils.logger import setup_logger
 
 load_dotenv()
 PREFIX = os.getenv("PREFIX")
+GUILD_ID = os.getenv("GUILD_ENV")
 
 logger = setup_logger()
 intents = discord.Intents.all()
@@ -29,7 +30,7 @@ async def on_ready():
     # Change if you want your own twitch
     activity = discord.Streaming(name="!help", url="https://twitch.tv/insane1y")
     logger.info(f"Client {bot.user} is ready")
-    synced = await bot.tree.sync()
+    synced = await bot.tree.sync(guild=GUILD_ID)
     print(f"Synced {len(synced)} command(s)")
     await bot.change_presence(activity=activity)
 
