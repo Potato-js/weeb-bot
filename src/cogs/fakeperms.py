@@ -1,19 +1,36 @@
 import discord
 import json
-import sqlite3
+import psycopg2
+
+# from psycopg2 import sql
+# from psycopg2.extras import DictCursor
 
 from discord.ext import commands
+from dotenv import load_dotenv
+from os import getenv
 from src.utils.logger import setup_logger
 from src.utils.embeds import EmbedUtils
 from src.utils.checks import is_server_owner
 
 logger = setup_logger()
+load_dotenv()
+DB_NAME = getenv("DB_NAME")
+DB_USER = getenv("DB_USER")
+DB_PASSWORD = getenv("DB_PASSWORD")
+DB_HOST = getenv("DB_HOST")
+DB_PORT = getenv("DB_PORT")
 
 
 class FakePerms(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.db_path = "./src/databases/fakeperms.db"
+        self.db_config = {
+            "dbname": DB_NAME,
+            "user": DB_USER,
+            "password": DB_PASSWORD,
+            "host": DB_HOST,
+            "port": DB_PORT,
+        }
         self.permission_file = "./json/permissions.json"
         self.permission_flags = self.load_permission_flags()
         self._setup_database()
@@ -31,58 +48,73 @@ class FakePerms(commands.Cog):
 
     def _setup_database(self):
         """
-        Set up the SQLite database for storing role permissions.
+        Set up the PostgreSQL database for storing role permissions.
         """
         try:
-            conn = sqlite3.connect(self.db_path)
-            c = conn.cursor()
-            c.execute(
+            conn = psycopg2.connect(**self.db_config)
+            cur = conn.cursor()
+            cur.execute(
                 """
                 CREATE TABLE IF NOT EXISTS role_permissions (
-                    role_id INTEGER PRIMARY KEY,
+                    role_id BIGINT PRIMARY KEY,
                     permissions INTEGER NOT NULL
                 )
                 """
             )
             conn.commit()
+        except Exception as e:
+            logger.error(f"Database setup error: {e}")
         finally:
-            conn.close()
+            if conn:
+                cur.close()
+                conn.close()
 
     def get_role_permissions(self, role_id: int):
         """
         Retrieve the permissions for a role from the database.
         """
-        conn = sqlite3.connect(self.db_path)
+        conn = None
         try:
-            c = conn.cursor()
-            c.execute(
+            conn = psycopg2.connect(**self.db_config)
+            cur = conn.cursor()
+            cur.execute(
                 """
-                SELECT permissions FROM role_permissions WHERE role_id = ?
+                SELECT permissions FROM role_permissions WHERE role_id = %s
                 """,
                 (role_id,),
             )
-            result = c.fetchone()
+            result = cur.fetchone()
             return result[0] if result else 0
+        except Exception as e:
+            logger.error(f"Error retrieving role permissions: {e}")
+            return 0
         finally:
-            conn.close()
+            if conn:
+                cur.close()
+                conn.close()
 
     def set_role_permissions(self, role_id: int, permissions: int):
         """
         Save permissions for a role in the database.
         """
-        conn = sqlite3.connect(self.db_path)
+        conn = None
         try:
-            c = conn.cursor()
-            c.execute(
+            conn = psycopg2.connect(**self.db_config)
+            cur = conn.cursor()
+            cur.execute(
                 """
-                INSERT INTO role_permissions (role_id, permissions) VALUES (?, ?)
-                ON CONFLICT(role_id) DO UPDATE SET permissions = excluded.permissions
+                INSERT INTO role_permissions (role_id, permissions) VALUES (%s, %s)
+                ON CONFLICT (role_id) DO UPDATE SET permissions = EXCLUDED.permissions
                 """,
                 (role_id, permissions),
             )
             conn.commit()
+        except Exception as e:
+            logger.error(f"Error setting role permissions: {e}")
         finally:
-            conn.close()
+            if conn:
+                cur.close()
+                conn.close()
 
     @commands.Cog.listener()
     async def on_command_error(
