@@ -1,5 +1,7 @@
 # weeb-bot
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/lgGPBM?referralCode=PfIlb7)
+
 ![GitHub License](https://img.shields.io/github/license/Potato-js/weeb-bot)
 ![GitHub Release](https://img.shields.io/github/v/release/Potato-js/weeb-bot)
   
