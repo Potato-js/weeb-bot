@@ -12,3 +12,15 @@ class PlayerIsNotAvailable(WeeabooError):
 
     def __init__(self, message="❗ | The bot isn't connected to a VC", *args):
         super().__init__(message, *args)
+
+
+class EconomyError(WeeabooError):
+    """Raised when an economy cog error happens"""
+
+    pass
+
+
+class InvalidFunds(EconomyError):
+    """Raised when the user has invalid funds in either the bank or wallet"""
+
+    pass

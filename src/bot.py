@@ -28,7 +28,7 @@ async def load_cogs():
 @bot.event
 async def on_ready():
     # Change if you want your own twitch
-    activity = discord.Streaming(name="!help", url="https://twitch.tv/insane1y")
+    activity = discord.Streaming(name=f"{PREFIX}help", url="https://twitch.tv/insane1y")
     logger.info(f"Client {bot.user} is ready")
     synced = await bot.tree.sync(guild=GUILD_ID)
     print(f"Synced {len(synced)} command(s)")

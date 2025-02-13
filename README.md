@@ -69,7 +69,7 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
 
 ## Attributions
 
-Used [Red-DiscordBot](https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/.github/workflows/lint_python.yaml) python linter
+Used IKEA's [Blahaj](https://www.ikea.com/ca/en/p/blahaj-soft-toy-shark-90373590/) for the currency :)
 
 ## License
 

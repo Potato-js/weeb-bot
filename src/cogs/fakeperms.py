@@ -1,9 +1,9 @@
 import discord
 import json
-import psycopg2
+import psycopg
 
-# from psycopg2 import sql
-# from psycopg2.extras import DictCursor
+# from psycopg import sql
+# from psycopg.extras import DictCursor
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -51,7 +51,7 @@ class FakePerms(commands.Cog):
         Set up the PostgreSQL database for storing role permissions.
         """
         try:
-            conn = psycopg2.connect(**self.db_config)
+            conn = psycopg.connect(**self.db_config)
             cur = conn.cursor()
             cur.execute(
                 """
@@ -75,7 +75,7 @@ class FakePerms(commands.Cog):
         """
         conn = None
         try:
-            conn = psycopg2.connect(**self.db_config)
+            conn = psycopg.connect(**self.db_config)
             cur = conn.cursor()
             cur.execute(
                 """
@@ -99,7 +99,7 @@ class FakePerms(commands.Cog):
         """
         conn = None
         try:
-            conn = psycopg2.connect(**self.db_config)
+            conn = psycopg.connect(**self.db_config)
             cur = conn.cursor()
             cur.execute(
                 """

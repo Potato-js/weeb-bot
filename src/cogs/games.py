@@ -1,6 +1,6 @@
 import discord
 import random
-import psycopg2
+import psycopg
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -27,7 +27,7 @@ DB_PARAMS = {
 
 
 def get_db_connection():
-    return psycopg2.connect(**DB_PARAMS)
+    return psycopg.connect(**DB_PARAMS)
 
 
 class Games(commands.Cog):
