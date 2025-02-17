@@ -4,6 +4,7 @@ import os
 from discord.ext import commands
 from dotenv import load_dotenv
 from src.utils.logger import setup_logger
+from src.utils.economy import EconomyUtils
 
 load_dotenv()
 PREFIX = os.getenv("PREFIX")
@@ -32,6 +33,7 @@ async def on_ready():
     logger.info(f"Client {bot.user} is ready")
     synced = await bot.tree.sync(guild=GUILD_ID)
     print(f"Synced {len(synced)} command(s)")
+    await EconomyUtils.setup_database()
     await bot.change_presence(activity=activity)
 
 

@@ -50,7 +50,7 @@ class Moderation(commands.Cog):
         *,
         reason: Optional[str] = "No reason provided.",
     ):
-
+        """Kicks a specified member (Requires KICK_MEMBERS)"""
         await member.kick(reason=reason)
         kick_embed = EmbedUtils.create_embed(
             title="Member Kicked",
@@ -69,6 +69,7 @@ class Moderation(commands.Cog):
         duration: Optional[str] = "30d",
         reason: Optional[str] = "No reason provided.",
     ):
+        """Bans a specified member (Requires BAN_MEMBERS)"""
         guild = ctx.guild
         duration_seconds = self.parse_duration(duration)
         if duration_seconds is None:
@@ -103,6 +104,7 @@ class Moderation(commands.Cog):
         user: discord.User,
         reason: Optional[str] = "No reason Provided",
     ):
+        """Unbans a specified member (Requires BAN_MEMBERS)"""
         guild = ctx.guild
 
         await guild.unban(user=user, reason=reason)
@@ -123,6 +125,7 @@ class Moderation(commands.Cog):
         *,
         reason: Optional[str] = "No reason provided",
     ):
+        """Timeouts/mutes a specified member (Requires MODERATE_MEMBERS)"""
         seconds = parse_duration(duration)
         if seconds > 2419200:
             toolong_embed = EmbedUtils.warning_embed(
@@ -145,6 +148,7 @@ class Moderation(commands.Cog):
         ctx: commands.Context,
         user: discord.Member,
     ):
+        """Removes timeout/mute from a specified member (Requires MODERATE_MEMBERS)"""
         await user.timeout(None)
         timeout_embed = EmbedUtils.create_embed(
             title="Time out removed",

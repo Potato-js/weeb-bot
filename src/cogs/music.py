@@ -179,6 +179,7 @@ class Music(commands.Cog):
 
     @commands.hybrid_command(name="volume", aliases=["vol", "v"])
     async def music_volume(self, ctx, value: int):
+        """Sets the volume of the player between 0-100"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             raise PlayerIsNotAvailable()
@@ -201,6 +202,7 @@ class Music(commands.Cog):
 
     @commands.hybrid_command(name="disconnect", aliases=["stop", "dc", "leave"])
     async def music_disconnect(self, ctx):
+        """Disconnects the player from the channel"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             raise PlayerIsNotAvailable()
@@ -211,6 +213,7 @@ class Music(commands.Cog):
 
     @commands.hybrid_command(name="loop", aliases=["repeat", "l"])
     async def music_loop_track(self, ctx: commands.Context):
+        """Loops the current track"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             raise PlayerIsNotAvailable()
@@ -231,6 +234,7 @@ class Music(commands.Cog):
 
     @commands.hybrid_command(name="shuffle", aliases=["sh"])
     async def music_shuffle_queue(self, ctx):
+        """Shuffles the current track"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             raise PlayerIsNotAvailable()

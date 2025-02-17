@@ -110,6 +110,7 @@ class Games(commands.Cog):
     )
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def games_diceroll(self, ctx):
+        """A die gets rolled and gives a result 1-6"""
         dice_roll = random.randint(1, 6)
         response_embed = EmbedUtils.create_embed(
             title="Dice Roll 🎲",
@@ -128,6 +129,7 @@ class Games(commands.Cog):
         name="csetup", description="Setup for the Counting Channel"
     )
     async def games_setup_counting(self, ctx):
+        """Setup for the Counting Channel"""
         try:
             guild = ctx.guild
             existing_channel = discord.utils.get(guild.channels, name="counting")
