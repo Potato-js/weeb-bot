@@ -86,7 +86,7 @@ class Music(commands.Cog):
             return
 
         if player.queue.mode == wavelink.QueueMode.loop:
-            await player.play(payload.track)  # Replay the current track
+            await player.play(payload.track)
 
         if not player.queue.is_empty:
             new = await player.queue.get_wait()
@@ -122,7 +122,6 @@ class Music(commands.Cog):
                 await ctx.send(embed=error_embed)
                 return
 
-        # Lock player to VC
         if not hasattr(player, "home"):
             player.home = ctx.channel
         elif player.home != ctx.channel:

@@ -16,7 +16,6 @@ DB_PASSWORD = getenv("DB_PASSWORD")
 DB_HOST = getenv("DB_HOST")
 DB_PORT = getenv("DB_PORT")
 
-# Database connection settings
 DB_PARAMS = {
     "dbname": DB_NAME,
     "user": DB_USER,
@@ -36,11 +35,9 @@ class Games(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        # Connect to DB
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Create table if doesn't exist
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS counting_channels (
@@ -56,13 +53,12 @@ class Games(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
-            return  # Ignore bot messages
+            return
 
         conn = get_db_connection()
         cursor = conn.cursor()
         channel_id = message.channel.id
 
-        # Check if the channel is a counting channel
         cursor.execute(
             "SELECT count FROM counting_channels WHERE channel_id = %s", (channel_id,)
         )
@@ -156,7 +152,6 @@ class Games(commands.Cog):
                 conn.close()
                 return
 
-            # Create the counting channel
             counting_channel = await guild.create_text_channel("counting")
             cursor.execute(
                 "INSERT INTO counting_channels (channel_id, count) VALUES (%s, 1)",
