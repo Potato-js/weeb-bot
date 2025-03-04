@@ -1,6 +1,6 @@
 discord.py==2.5.0
 python-dotenv==1.0.1
-pytest==8.3.4
+pytest==8.3.5
 wavelink==3.4.1
 psycopg==3.2.4
 psycopg_binary==3.2.4
