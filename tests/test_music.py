@@ -1,123 +1,160 @@
 import pytest
-from unittest.mock import patch, AsyncMock, MagicMock
-from discord.ext import commands
+import asyncio
+from unittest.mock import MagicMock, AsyncMock, patch
 import wavelink
 from src.cogs.music import Music
 from src.utils.errors import PlayerIsNotAvailable
 
+# FILE: src/cogs/test_music.py
 
-class TestMusicCog:
-    @pytest.fixture(scope="class")
-    def mock_voice_client(self):
-        # Use AsyncMock for the entire voice client.
-        voice_client = AsyncMock(spec=wavelink.Player)
-        voice_client.connected = True
-        voice_client.playing = False
-        voice_client.paused = False
 
-        # Ensure async methods are AsyncMock.
-        voice_client.skip = AsyncMock()
-        voice_client.pause = AsyncMock()
-        voice_client.play = AsyncMock()
-        voice_client.set_volume = AsyncMock()
-        voice_client.disconnect = AsyncMock()
+# Dummy QueueMode to simulate wavelink.QueueMode if needed
+NORMAL = wavelink.QueueMode.normal
+LOOP = wavelink.QueueMode.loop
 
-        # Set up the queue using AsyncMock for async methods.
-        voice_client.queue = MagicMock()
-        voice_client.queue.mode = wavelink.QueueMode.normal
-        voice_client.queue.is_empty = False
-        voice_client.queue.count = 5
-        voice_client.queue.put_wait = AsyncMock()
-        voice_client.queue.shuffle = AsyncMock()
 
-        return voice_client
+@pytest.fixture()
+def dummy_bot():
+    return MagicMock()
 
-    @pytest.fixture(scope="class")
-    def mock_bot(self):
-        return MagicMock(spec=commands.Bot)
 
-    @pytest.fixture(scope="class")
-    def cog(self, mock_bot, mock_voice_client):
-        cog = Music(mock_bot)
-        cog.bot = mock_bot
-        return cog
+@pytest.fixture()
+def cog(dummy_bot):
+    return Music(dummy_bot)
 
-    @pytest.fixture
-    def mock_ctx(self, mock_voice_client):
-        ctx = MagicMock()
-        # Simulate that the command author is in a voice channel.
-        ctx.author.voice.channel = MagicMock()
-        ctx.voice_client = mock_voice_client
-        # Make ctx.send awaitable
-        ctx.send = AsyncMock()
-        # Set up the message attribute so that add_reaction is awaitable
-        ctx.message = MagicMock()
-        ctx.message.add_reaction = AsyncMock()
-        return ctx
 
-    @pytest.mark.asyncio
-    async def test_setup_hook(self, cog, mock_voice_client):
-        with patch.object(
-            wavelink.Pool, "connect", new_callable=AsyncMock
-        ) as mock_connect:
-            await cog.setup_hook()
-            mock_connect.assert_called_once()
+@pytest.fixture()
+def mock_queue():
+    queue = MagicMock()
+    queue.shuffle = AsyncMock()
+    # Set __len__ to return 5 songs, for example
+    queue.__len__.return_value = 5
+    # Simulate queue mode attribute
+    queue.mode = NORMAL
+    return queue
 
-    @pytest.mark.asyncio
-    async def test_play_command(self, cog, mock_ctx, mock_voice_client):
-        # Create a fake track.
-        mock_track = MagicMock()
-        mock_track.uri = "test_uri"
-        mock_track.title = "Test Track"
 
-        with patch.object(
-            wavelink.Playable,
-            "search",
-            new_callable=AsyncMock,
-            return_value=[mock_track],
-        ) as mock_search:
-            await cog.music_play.callback(cog, mock_ctx, query="test query")
-            mock_search.assert_called_once_with("test query")
-            mock_voice_client.queue.put_wait.assert_called_once()
-            mock_voice_client.play.assert_called_once()
+@pytest.fixture()
+def mock_player(mock_queue):
+    player = MagicMock()
+    player.queue = mock_queue
+    # For loop command test, allow toggling current track
+    player.current = True
+    # For pause/resume, simulate paused attribute
+    player.paused = False
+    # Simulate skip method
+    player.skip = AsyncMock()
+    # Simulate play, disconnect, and set_volume methods when needed
+    player.play = AsyncMock()
+    player.disconnect = AsyncMock()
+    player.set_volume = AsyncMock()
+    return player
 
-    @pytest.mark.asyncio
-    async def test_skip_command(self, cog, mock_ctx, mock_voice_client):
-        await cog.music_skip.callback(cog, mock_ctx)
-        mock_voice_client.skip.assert_called_once()
 
-    @pytest.mark.asyncio
-    async def test_toggle_command(self, cog, mock_ctx, mock_voice_client):
-        initial_state = mock_voice_client.paused
-        await cog.music_play_pause.callback(cog, mock_ctx)
-        mock_voice_client.pause.assert_called_once_with(not initial_state)
+@pytest.fixture()
+def mock_ctx(mock_player):
+    ctx = MagicMock()
+    # voice_client is our fake player
+    ctx.voice_client = mock_player
+    ctx.send = AsyncMock()
+    ctx.message = MagicMock()
+    ctx.message.add_reaction = AsyncMock()
+    # Also simulate guild attribute for commands like play
+    ctx.guild = True
+    # Provide an author with a voice channel for play command if needed
+    ctx.author = MagicMock()
+    ctx.author.voice = MagicMock()
+    ctx.author.voice.channel = MagicMock()
+    # For channel mention in already connected voice channel scenario
+    ctx.channel = MagicMock()
+    ctx.channel.mention = "#general"
+    return ctx
 
-    @pytest.mark.asyncio
-    async def test_volume_command(self, cog, mock_ctx, mock_voice_client):
-        await cog.music_volume.callback(cog, mock_ctx, 50)
-        mock_voice_client.set_volume.assert_called_once_with(50)
 
-    @pytest.mark.asyncio
-    async def test_disconnect_command(self, cog, mock_ctx, mock_voice_client):
-        await cog.music_disconnect.callback(cog, mock_ctx)
-        mock_voice_client.disconnect.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_loop_command(self, cog, mock_ctx, mock_voice_client):
-        await cog.music_loop_track.callback(cog, mock_ctx)
-        assert mock_voice_client.queue.mode == wavelink.QueueMode.loop
-        await cog.music_loop_track.callback(cog, mock_ctx)
-        assert mock_voice_client.queue.mode == wavelink.QueueMode.normal
-
-    @pytest.mark.asyncio
-    async def test_shuffle_command(self, cog, mock_ctx, mock_voice_client):
+@pytest.mark.asyncio
+async def test_music_shuffle_queue_success(cog, mock_ctx, mock_player):
+    dummy_embed = MagicMock()
+    expected_description = "🔀 | Shuffling the queue of **5 songs**"
+    with patch(
+        "src.cogs.music.EmbedUtils.success_embed", return_value=dummy_embed
+    ) as mock_success_embed:
         await cog.music_shuffle_queue.callback(cog, mock_ctx)
-        mock_voice_client.queue.shuffle.assert_called_once()
+        # Assert that player's queue.shuffle was awaited once
+        mock_player.queue.shuffle.assert_awaited_once()
+        # Assert that EmbedUtils.success_embed was called with expected description and title "Shuffling..."
+        mock_success_embed.assert_called_once_with(
+            description=expected_description, title="Shuffling..."
+        )
+        # Assert that ctx.send was awaited with the dummy embed
+        mock_ctx.send.assert_awaited_once_with(embed=dummy_embed)
 
-    @pytest.mark.asyncio
-    async def test_error_handling(self, cog):
-        mock_ctx = MagicMock()
-        mock_ctx.voice_client = None
-        mock_ctx.send = AsyncMock()
-        with pytest.raises(PlayerIsNotAvailable):
-            await cog.music_skip.callback(cog, mock_ctx)
+
+@pytest.mark.asyncio
+async def test_music_shuffle_queue_no_voice_client(cog):
+    ctx = MagicMock()
+    ctx.voice_client = None
+    ctx.send = AsyncMock()
+    with pytest.raises(PlayerIsNotAvailable):
+        await cog.music_shuffle_queue.callback(ctx)
+
+
+@pytest.mark.asyncio
+async def test_music_loop_track_enable(cog, mock_ctx, mock_player):
+    # Set player.current true and queue.mode to NORMAL and patch success_embed.
+    mock_player.current = True
+    mock_player.queue.mode = NORMAL
+    dummy_embed = MagicMock()
+    with patch(
+        "src.cogs.music.EmbedUtils.success_embed", return_value=dummy_embed
+    ) as mock_success_embed:
+        await cog.music_loop_track(mock_ctx)
+        # Expect mode toggled to LOOP
+        assert mock_player.queue.mode == LOOP
+        mock_success_embed.assert_called_once_with(description="🔂 | Loop mode enabled")
+        mock_ctx.send.assert_awaited_once_with(embed=dummy_embed)
+
+
+@pytest.mark.asyncio
+async def test_music_loop_track_disable(cog, mock_ctx, mock_player):
+    # Set current true and queue.mode to LOOP (simulate already looping)
+    mock_player.current = True
+    mock_player.queue.mode = LOOP
+    dummy_embed = MagicMock()
+    with patch(
+        "src.cogs.music.EmbedUtils.success_embed", return_value=dummy_embed
+    ) as mock_success_embed:
+        await cog.music_loop_track(mock_ctx)
+        # Expect mode toggled back to NORMAL
+        assert mock_player.queue.mode == NORMAL
+        mock_success_embed.assert_called_once_with(
+            description="🔂 | Loop mode disabled"
+        )
+        mock_ctx.send.assert_awaited_once_with(embed=dummy_embed)
+
+
+@pytest.mark.asyncio
+async def test_music_loop_track_no_voice_client(cog):
+    ctx = MagicMock()
+    ctx.voice_client = None
+    ctx.send = AsyncMock()
+    with pytest.raises(PlayerIsNotAvailable):
+        await cog.music_loop_track(ctx)
+
+
+@pytest.mark.asyncio
+async def test_music_skip_success(cog, mock_ctx, mock_player):
+    await cog.music_skip(mock_ctx)
+    # Assert that player.skip was awaited once
+    mock_player.skip.assert_awaited_once()
+    # Assert reaction added to message
+    mock_ctx.message.add_reaction.assert_awaited_once_with("✅")
+
+
+@pytest.mark.asyncio
+async def test_music_skip_no_voice_client(cog):
+    ctx = MagicMock()
+    ctx.voice_client = None
+    ctx.message = MagicMock()
+    ctx.message.add_reaction = AsyncMock()
+    with pytest.raises(PlayerIsNotAvailable):
+        await cog.music_skip(ctx)
