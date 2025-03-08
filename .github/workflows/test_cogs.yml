@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  test-music-cog:
+  test-all-cogs:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,4 +31,4 @@ jobs:
       # Run tests
       - name: Run test_music test
         run: |
-          pytest tests/test_music.py
+          pytest
