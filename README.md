@@ -23,6 +23,7 @@ This is a bot I started purely for fun. The bot is fully coded in python. If you
 
 1. Create a `.env` file and refer to the `.env.example` for all environment variables
 2. Install all dependancies using `pip install -r requirements.txt` or `pip3 install -r requirements.txt`
+   - *Note: If you are using windows remove the packages `psycopg_binary` and `psycopg_c`*
 3. Once installed all the dependancies run `python main.py` or `python3 main.py`
 
 ## Roadmap
