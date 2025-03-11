@@ -21,7 +21,7 @@ DB_HOST = getenv("DB_HOST")
 DB_PORT = getenv("DB_PORT")
 
 
-class FakePerms:
+class FakePerms(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db_config = {
