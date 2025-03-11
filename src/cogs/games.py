@@ -1,6 +1,6 @@
 import discord
 import random
-import psycopg2
+import psycopg
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -16,7 +16,6 @@ DB_PASSWORD = getenv("DB_PASSWORD")
 DB_HOST = getenv("DB_HOST")
 DB_PORT = getenv("DB_PORT")
 
-# Database connection settings
 DB_PARAMS = {
     "dbname": DB_NAME,
     "user": DB_USER,
@@ -27,7 +26,7 @@ DB_PARAMS = {
 
 
 def get_db_connection():
-    return psycopg2.connect(**DB_PARAMS)
+    return psycopg.connect(**DB_PARAMS)
 
 
 class Games(commands.Cog):
@@ -36,11 +35,9 @@ class Games(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        # Connect to DB
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Create table if doesn't exist
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS counting_channels (
@@ -56,13 +53,12 @@ class Games(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
-            return  # Ignore bot messages
+            return
 
         conn = get_db_connection()
         cursor = conn.cursor()
         channel_id = message.channel.id
 
-        # Check if the channel is a counting channel
         cursor.execute(
             "SELECT count FROM counting_channels WHERE channel_id = %s", (channel_id,)
         )
@@ -110,6 +106,7 @@ class Games(commands.Cog):
     )
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def games_diceroll(self, ctx):
+        """A die gets rolled and gives a result 1-6"""
         dice_roll = random.randint(1, 6)
         response_embed = EmbedUtils.create_embed(
             title="Dice Roll 🎲",
@@ -128,6 +125,7 @@ class Games(commands.Cog):
         name="csetup", description="Setup for the Counting Channel"
     )
     async def games_setup_counting(self, ctx):
+        """Setup for the Counting Channel"""
         try:
             guild = ctx.guild
             existing_channel = discord.utils.get(guild.channels, name="counting")
@@ -154,7 +152,6 @@ class Games(commands.Cog):
                 conn.close()
                 return
 
-            # Create the counting channel
             counting_channel = await guild.create_text_channel("counting")
             cursor.execute(
                 "INSERT INTO counting_channels (channel_id, count) VALUES (%s, 1)",

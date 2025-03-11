@@ -4,6 +4,7 @@ import os
 from discord.ext import commands
 from dotenv import load_dotenv
 from src.utils.logger import setup_logger
+from src.utils.economy import EconomyUtils
 
 load_dotenv()
 PREFIX = os.getenv("PREFIX")
@@ -28,10 +29,11 @@ async def load_cogs():
 @bot.event
 async def on_ready():
     # Change if you want your own twitch
-    activity = discord.Streaming(name="!help", url="https://twitch.tv/insane1y")
+    activity = discord.Streaming(name=f"{PREFIX}help", url="https://twitch.tv/insane1y")
     logger.info(f"Client {bot.user} is ready")
     synced = await bot.tree.sync(guild=GUILD_ID)
     print(f"Synced {len(synced)} command(s)")
+    await EconomyUtils.setup_database()
     await bot.change_presence(activity=activity)
 
 

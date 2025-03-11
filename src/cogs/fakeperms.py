@@ -1,9 +1,9 @@
 import discord
 import json
-import psycopg2
+import psycopg
 
-# from psycopg2 import sql
-# from psycopg2.extras import DictCursor
+# from psycopg import sql
+# from psycopg.extras import DictCursor
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -21,8 +21,8 @@ DB_HOST = getenv("DB_HOST")
 DB_PORT = getenv("DB_PORT")
 
 
-class FakePerms(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+class FakePerms:
+    def __init__(self, bot):
         self.bot = bot
         self.db_config = {
             "dbname": DB_NAME,
@@ -51,7 +51,7 @@ class FakePerms(commands.Cog):
         Set up the PostgreSQL database for storing role permissions.
         """
         try:
-            conn = psycopg2.connect(**self.db_config)
+            conn = psycopg.connect(**self.db_config)
             cur = conn.cursor()
             cur.execute(
                 """
@@ -65,8 +65,9 @@ class FakePerms(commands.Cog):
         except Exception as e:
             logger.error(f"Database setup error: {e}")
         finally:
-            if conn:
+            if cur:
                 cur.close()
+            if conn:
                 conn.close()
 
     def get_role_permissions(self, role_id: int):
@@ -75,7 +76,7 @@ class FakePerms(commands.Cog):
         """
         conn = None
         try:
-            conn = psycopg2.connect(**self.db_config)
+            conn = psycopg.connect(**self.db_config)
             cur = conn.cursor()
             cur.execute(
                 """
@@ -86,20 +87,22 @@ class FakePerms(commands.Cog):
             result = cur.fetchone()
             return result[0] if result else 0
         except Exception as e:
-            logger.error(f"Error retrieving role permissions: {e}")
+            logger.error(
+                f"Error retrieving role permissions for role_id {role_id}: {e}"
+            )
             return 0
         finally:
-            if conn:
+            if cur:
                 cur.close()
+            if conn:
                 conn.close()
 
     def set_role_permissions(self, role_id: int, permissions: int):
         """
-        Save permissions for a role in the database.
+        Set the permissions for a role in the database.
         """
-        conn = None
         try:
-            conn = psycopg2.connect(**self.db_config)
+            conn = psycopg.connect(**self.db_config)
             cur = conn.cursor()
             cur.execute(
                 """
@@ -110,10 +113,11 @@ class FakePerms(commands.Cog):
             )
             conn.commit()
         except Exception as e:
-            logger.error(f"Error setting role permissions: {e}")
+            logger.error(f"Error setting role permissions for role_id {role_id}: {e}")
         finally:
-            if conn:
+            if cur:
                 cur.close()
+            if conn:
                 conn.close()
 
     @commands.Cog.listener()
