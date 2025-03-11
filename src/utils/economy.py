@@ -39,6 +39,7 @@ class EconomyUtils:
             "INSERT INTO bank VALUES(%s, %s, %s, %s)", (user_id, 0, 100, 25000)
         )
         conn.commit()
+        cursor.close()
         conn.close()
         return
 
