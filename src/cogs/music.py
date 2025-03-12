@@ -97,7 +97,7 @@ class Music(commands.Cog):
             await player.disconnect()
 
     @commands.hybrid_command(name="play", aliases=["p"])
-    async def music_play(self, ctx, *, query: str):
+    async def music_play(self, ctx: commands.Context, *, query: str):
         """Plays a song from a playlist/link/query"""
         if not ctx.guild:
             return
@@ -157,7 +157,7 @@ class Music(commands.Cog):
             await player.play(player.queue.get(), volume=30)
 
     @commands.hybrid_command(name="skip")
-    async def music_skip(self, ctx):
+    async def music_skip(self, ctx: commands.Context):
         """ "Skips the current song"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
@@ -167,7 +167,7 @@ class Music(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.hybrid_command(name="toggle", aliases=["pause", "resume", "r"])
-    async def music_play_pause(self, ctx):
+    async def music_play_pause(self, ctx: commands.Context):
         """Pause or Resume the player depending on its state"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
@@ -177,7 +177,7 @@ class Music(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.hybrid_command(name="volume", aliases=["vol", "v"])
-    async def music_volume(self, ctx, value: int):
+    async def music_volume(self, ctx: commands.Context, value: int):
         """Sets the volume of the player between 0-100"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
@@ -200,7 +200,7 @@ class Music(commands.Cog):
             await ctx.message.add_reaction("✅")
 
     @commands.hybrid_command(name="disconnect", aliases=["stop", "dc", "leave"])
-    async def music_disconnect(self, ctx):
+    async def music_disconnect(self, ctx: commands.Context):
         """Disconnects the player from the channel"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:
@@ -232,7 +232,7 @@ class Music(commands.Cog):
                 await ctx.send(embed=loop_embed)
 
     @commands.hybrid_command(name="shuffle", aliases=["sh"])
-    async def music_shuffle_queue(self, ctx):
+    async def music_shuffle_queue(self, ctx: commands.Context):
         """Shuffles the current track"""
         player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
         if not player:

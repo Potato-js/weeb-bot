@@ -20,7 +20,7 @@ class Moderation(commands.Cog):
         self.parse_duration = parse_duration
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
             missing_perms = ", ".join(error.missing_permissions)
             missing_perms_embed = EmbedUtils.error_embed(
@@ -45,7 +45,7 @@ class Moderation(commands.Cog):
     @check_perms("kick_members")
     async def moderator_kick(
         self,
-        ctx,
+        ctx: commands.Context,
         member: discord.Member,
         *,
         reason: Optional[str] = "No reason provided.",

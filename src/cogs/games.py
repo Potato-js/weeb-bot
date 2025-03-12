@@ -105,7 +105,7 @@ class Games(commands.Cog):
         aliases=["dice", "roll"],
     )
     @commands.cooldown(1, 15, commands.BucketType.user)
-    async def games_diceroll(self, ctx):
+    async def games_diceroll(self, ctx: commands.Context):
         """A die gets rolled and gives a result 1-6"""
         dice_roll = random.randint(1, 6)
         response_embed = EmbedUtils.create_embed(
@@ -124,7 +124,7 @@ class Games(commands.Cog):
     @commands.hybrid_command(
         name="csetup", description="Setup for the Counting Channel"
     )
-    async def games_setup_counting(self, ctx):
+    async def games_setup_counting(self, ctx: commands.Context):
         """Setup for the Counting Channel"""
         try:
             guild = ctx.guild

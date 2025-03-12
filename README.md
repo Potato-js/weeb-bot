@@ -70,8 +70,9 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
 
 ## Attributions
 
-Used IKEA's [Blahaj](https://www.ikea.com/ca/en/p/blahaj-soft-toy-shark-90373590/) for the currency :)
-Currency Cog based off of [Glowstik's Tutorial](https://www.youtube.com/@glowstik)
+- Used IKEA's [Blahaj](https://www.ikea.com/ca/en/p/blahaj-soft-toy-shark-90373590/) for the currency :)
+- Currency Cog based off of [Glowstik's Tutorial](https://www.youtube.com/@glowstik)
+- ChatGPT for all the celebs and Economy messages
 
 ## License
 

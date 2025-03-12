@@ -138,14 +138,16 @@ class FakePerms(commands.Cog):
         aliases=["fp"],
     )
     @is_server_owner()
-    async def mod_fakeperms(self, ctx):
+    async def mod_fakeperms(self, ctx: commands.Context):
         """
         Base command for the `fakeperms` hybrid group.
         """
         pass
 
     @mod_fakeperms.command(name="grant", help="Grant a permission to a role.")
-    async def fp_grant_permission(self, ctx, role: discord.Role, perm_name: str):
+    async def fp_grant_permission(
+        self, ctx: commands.Context, role: discord.Role, perm_name: str
+    ):
         perm_flag = self.permission_flags.get(perm_name.upper())
         if not perm_flag:
             embed = EmbedUtils.error_embed(
@@ -163,7 +165,9 @@ class FakePerms(commands.Cog):
         await ctx.send(embed=embed)
 
     @mod_fakeperms.command(name="revoke", help="Revoke a permission from a role.")
-    async def fp_revoke_permission(self, ctx, role: discord.Role, *, perm_name: str):
+    async def fp_revoke_permission(
+        self, ctx: commands.Context, role: discord.Role, *, perm_name: str
+    ):
         perm_flag = self.permission_flags.get(perm_name.upper())
         if not perm_flag:
             embed = EmbedUtils.error_embed(
@@ -181,7 +185,7 @@ class FakePerms(commands.Cog):
         await ctx.send(embed=embed)
 
     @mod_fakeperms.command(name="list", help="List permissions for a role.")
-    async def fp_list_permissions(self, ctx, role: discord.Role):
+    async def fp_list_permissions(self, ctx: commands.Context, role: discord.Role):
         current_perms = self.get_role_permissions(role.id)
         perms_list = [
             name for name, flag in self.permission_flags.items() if current_perms & flag
