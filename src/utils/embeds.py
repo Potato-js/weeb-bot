@@ -134,10 +134,6 @@ class EmbedUtils:
         )
 
 
-class EconomyEmbeds:
-    pass
-
-
 # Example Usage:
 # embed = EmbedUtils.create_embed(
 #     description="This is an example embed!",
