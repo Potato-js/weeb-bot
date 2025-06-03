@@ -1,5 +1,54 @@
+import sys
+from types import SimpleNamespace
+
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch, mock_open
+
+# Provide minimal stubs for the discord module so tests can run without the
+# real dependency.
+def _noop_decorator(*args, **kwargs):
+    def wrapper(func):
+        return func
+    return wrapper
+
+class Cog:
+    @staticmethod
+    def listener(*args, **kwargs):
+        return _noop_decorator
+
+def hybrid_group(*args, **kwargs):
+    def decorator(func):
+        func.command = _noop_decorator
+        return func
+    return decorator
+
+class Context:
+    pass
+
+class CommandError(Exception):
+    pass
+
+class MissingRequiredArgument(CommandError):
+    def __init__(self, param=None):
+        self.param = param
+
+commands_stub = SimpleNamespace(
+    Cog=Cog,
+    listener=_noop_decorator,
+    hybrid_group=hybrid_group,
+    command=_noop_decorator,
+    check=_noop_decorator,
+    Context=Context,
+    CommandError=CommandError,
+    MissingRequiredArgument=MissingRequiredArgument,
+)
+color_stub = SimpleNamespace(random=lambda: None, blue=lambda: None)
+sys.modules['discord'] = SimpleNamespace(Role=object, Color=color_stub, Embed=object)
+sys.modules['discord.ext'] = SimpleNamespace(commands=commands_stub)
+sys.modules['discord.ext.commands'] = commands_stub
+sys.modules['psycopg'] = MagicMock()
+sys.modules['dotenv'] = SimpleNamespace(load_dotenv=lambda: None)
+
 from src.cogs.fakeperms import FakePerms
 
 

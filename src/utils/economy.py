@@ -39,6 +39,7 @@ class EconomyUtils:
             "INSERT INTO bank VALUES(%s, %s, %s, %s)", (user_id, 0, 100, 25000)
         )
         conn.commit()
+        cursor.close()
         conn.close()
         return
 
@@ -54,6 +55,8 @@ class EconomyUtils:
             cls.create_wallet(user_id)
             return 0, 100, 25000
         wallet, bank, maxbank = data[0], data[1], data[2]
+        cursor.close()
+        conn.close()
         return wallet, bank, maxbank
 
     @classmethod
@@ -66,8 +69,9 @@ class EconomyUtils:
             cls.create_wallet(user_id)
             return 0
         cursor.execute(
-            "UPDATE bank SET wallet = %s, WHERE user_id = %s",
+            "UPDATE bank SET wallet = %s WHERE user_id = %s",
             (data[0] + amount, user_id),
         )
         conn.commit()
+        cursor.close()
         conn.close()
