@@ -10,7 +10,7 @@ class Utils(commands.Cog):
         self.bot = bot
 
     @commands.hybrid_command(name="ping", description="Check the bot's latency")
-    async def utilities_ping(self, ctx):
+    async def utilities_ping(self, ctx: commands.Context):
         """Check the bot's latency"""
         await ctx.send(f"Pong! {self.bot.latency}")
 
