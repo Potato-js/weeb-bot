@@ -17,7 +17,7 @@ This is a bot I started purely for fun. The bot is fully coded in python. If you
 
 - Python 3.11 or higher
 - PostgreSQL
-- Lavalink 4 (**You can use a server instead of using a local server, But make sure the server has LavaSrc for Spotify Support.**)
+- Lavalink 4
 
 ## Setup
 
@@ -51,7 +51,7 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
   - [x] Spotify Support
   - [ ] Interactive UI **
 - [ ] Statistics on some games **
-  - [ ] Valorant (limited to only player stats)
+~~  - [ ] Valorant (limited to only player stats)~~ *Impossible due to Riot's policy*
   - [ ] Hypixel
     - [ ] Bedwars Stats
     - [ ] Skywars Stats
