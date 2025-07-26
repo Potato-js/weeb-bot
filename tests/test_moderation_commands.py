@@ -13,6 +13,7 @@ COMMANDS = [
     ("moderator_unmute_or_untimeout", "unmute"),
 ]
 
+
 @pytest.mark.parametrize("func_name,command_name", COMMANDS)
 def test_moderation_command_decorators(func_name: str, command_name: str):
     assert os.path.exists(FILEPATH), f"{FILEPATH} does not exist"

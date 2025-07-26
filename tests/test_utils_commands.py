@@ -2,7 +2,8 @@ import sys
 import types
 import asyncio
 from unittest.mock import AsyncMock
-import pytest
+
+from src.cogs.utils import Utils
 
 # Provide a minimal stub of discord.ext.commands so the cog can be imported
 commands_stub = types.SimpleNamespace()
@@ -10,17 +11,20 @@ commands_stub.Cog = object
 commands_stub.Bot = object
 commands_stub.Context = object
 
+
 def hybrid_command(*args, **kwargs):
     def decorator(func):
         return func
+
     return decorator
+
 
 commands_stub.hybrid_command = hybrid_command
 
-sys.modules.setdefault("discord", types.SimpleNamespace(ext=types.SimpleNamespace(commands=commands_stub)))
+sys.modules.setdefault(
+    "discord", types.SimpleNamespace(ext=types.SimpleNamespace(commands=commands_stub))
+)
 sys.modules.setdefault("discord.ext", types.SimpleNamespace(commands=commands_stub))
-
-from src.cogs.utils import Utils
 
 
 class DummyContext:

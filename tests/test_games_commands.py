@@ -10,6 +10,7 @@ COMMANDS = [
     ("games_setup_counting", "csetup"),
 ]
 
+
 @pytest.mark.parametrize("func_name,command_name", COMMANDS)
 def test_games_command_decorators(func_name: str, command_name: str):
     assert os.path.exists(FILEPATH), f"{FILEPATH} does not exist"

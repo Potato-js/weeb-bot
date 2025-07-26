@@ -12,6 +12,7 @@ COMMANDS = [
     ("fp_list_permissions", "list"),
 ]
 
+
 @pytest.mark.parametrize("func_name,command_name", COMMANDS)
 def test_fakeperms_command_decorators(func_name: str, command_name: str):
     assert os.path.exists(FILEPATH), f"{FILEPATH} does not exist"
