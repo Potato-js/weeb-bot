@@ -1,36 +1,144 @@
-import ast
-import os
+import sys
+import types
+import asyncio
+from unittest.mock import AsyncMock
 import pytest
 
-from .command_utils import get_function_def
+# Stub discord.ext.commands so the cog can be imported without the real library
+commands_stub = types.SimpleNamespace()
 
-FILEPATH = "src/cogs/music.py"
-COMMANDS = [
-    ("music_play", "play"),
-    ("music_skip", "skip"),
-    ("music_play_pause", "toggle"),
-    ("music_volume", "volume"),
-    ("music_disconnect", "disconnect"),
-    ("music_loop_track", "loop"),
-    ("music_shuffle_queue", "shuffle"),
-]
+class DummyCog:
+    @staticmethod
+    def listener(*args, **kwargs):
+        def decorator(func):
+            return func
+        return decorator
 
-@pytest.mark.parametrize("func_name,command_name", COMMANDS)
-def test_music_command_decorators(func_name: str, command_name: str):
-    assert os.path.exists(FILEPATH), f"{FILEPATH} does not exist"
-    with open(FILEPATH, "r", encoding="utf-8") as f:
-        tree = ast.parse(f.read(), filename=FILEPATH)
+commands_stub.Cog = DummyCog
+commands_stub.Bot = object
+commands_stub.Context = object
+commands_stub.CommandError = Exception
 
-    func = get_function_def(tree, func_name)
-    assert func is not None, f"Function {func_name} not found in {FILEPATH}"
 
-    found = False
-    for dec in func.decorator_list:
-        if isinstance(dec, ast.Call) and hasattr(dec.func, "attr"):
-            if dec.func.attr in {"hybrid_command", "hybrid_group", "command"}:
-                for kw in dec.keywords:
-                    if kw.arg == "name" and isinstance(kw.value, ast.Constant):
-                        if kw.value.value == command_name:
-                            found = True
-                            break
-    assert found, f"{func_name} missing decorator name '{command_name}'"
+def hybrid_command(*args, **kwargs):
+    def decorator(func):
+        return func
+    return decorator
+
+
+commands_stub.hybrid_command = hybrid_command
+
+
+class DummyColor:
+    @staticmethod
+    def random():
+        return DummyColor()
+
+    @staticmethod
+    def green():
+        return DummyColor()
+
+    @staticmethod
+    def red():
+        return DummyColor()
+
+    @staticmethod
+    def yellow():
+        return DummyColor()
+
+
+class DummyEmbed:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def set_footer(self, *args, **kwargs):
+        pass
+
+    def set_thumbnail(self, *args, **kwargs):
+        pass
+
+    def set_image(self, *args, **kwargs):
+        pass
+
+    def add_field(self, *args, **kwargs):
+        pass
+
+    def set_author(self, *args, **kwargs):
+        pass
+
+
+discord_stub = types.SimpleNamespace(
+    ext=types.SimpleNamespace(commands=commands_stub),
+    ClientException=Exception,
+    Color=DummyColor,
+    Embed=DummyEmbed,
+)
+
+sys.modules.setdefault("discord", discord_stub)
+sys.modules.setdefault("discord.ext", types.SimpleNamespace(commands=commands_stub))
+
+# Provide a stub for python-dotenv
+sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda: None))
+
+# Stub minimal wavelink API used by the music cog
+wavelink_stub = types.SimpleNamespace()
+
+class DummyPlayer:
+    def __init__(self):
+        self.skip = AsyncMock()
+        self.disconnect = AsyncMock()
+
+wavelink_stub.Player = DummyPlayer
+wavelink_stub.QueueMode = types.SimpleNamespace(normal=1, loop=2)
+wavelink_stub.NodeReadyEventPayload = object
+wavelink_stub.TrackStartEventPayload = object
+wavelink_stub.TrackEndEventPayload = object
+wavelink_stub.Playable = types.SimpleNamespace(search=lambda *a, **k: [], recommended=False)
+wavelink_stub.Playlist = object
+wavelink_stub.Search = list
+wavelink_stub.Node = object
+wavelink_stub.Pool = types.SimpleNamespace(connect=AsyncMock())
+
+sys.modules.setdefault("wavelink", wavelink_stub)
+
+from src.cogs.music import Music
+from src.utils.embeds import EmbedUtils
+
+
+class DummyMessage:
+    def __init__(self):
+        self.add_reaction = AsyncMock()
+
+
+class DummyContext:
+    def __init__(self, player):
+        self.voice_client = player
+        self.message = DummyMessage()
+        self.send = AsyncMock()
+
+
+def test_music_skip_skips_track():
+    """Ensure the skip command skips the current track."""
+    bot = types.SimpleNamespace()
+    music_cog = Music(bot)
+    player = DummyPlayer()
+    ctx = DummyContext(player)
+
+    asyncio.run(music_cog.music_skip(ctx))
+
+    player.skip.assert_awaited_once_with()
+    ctx.message.add_reaction.assert_awaited_once_with("✅")
+
+
+def test_music_disconnect_disconnects_and_sends_message(monkeypatch: pytest.MonkeyPatch):
+    """Ensure the disconnect command disconnects the player and notifies the user."""
+    bot = types.SimpleNamespace()
+    music_cog = Music(bot)
+    player = DummyPlayer()
+    ctx = DummyContext(player)
+
+    monkeypatch.setattr(EmbedUtils, "success_embed", lambda *a, **k: "embed")
+    asyncio.run(music_cog.music_disconnect(ctx))
+
+    player.disconnect.assert_awaited_once_with()
+    ctx.send.assert_awaited_once_with(embed="embed")
