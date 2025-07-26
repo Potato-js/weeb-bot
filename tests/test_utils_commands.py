@@ -1,30 +1,39 @@
-import ast
-import os
+import sys
+import types
+import asyncio
+from unittest.mock import AsyncMock
 import pytest
 
-from .command_utils import get_function_def
+# Provide a minimal stub of discord.ext.commands so the cog can be imported
+commands_stub = types.SimpleNamespace()
+commands_stub.Cog = object
+commands_stub.Bot = object
+commands_stub.Context = object
 
-FILEPATH = "src/cogs/utils.py"
-COMMANDS = [
-    ("utilities_ping", "ping"),
-]
+def hybrid_command(*args, **kwargs):
+    def decorator(func):
+        return func
+    return decorator
 
-@pytest.mark.parametrize("func_name,command_name", COMMANDS)
-def test_utils_command_decorators(func_name: str, command_name: str):
-    assert os.path.exists(FILEPATH), f"{FILEPATH} does not exist"
-    with open(FILEPATH, "r", encoding="utf-8") as f:
-        tree = ast.parse(f.read(), filename=FILEPATH)
+commands_stub.hybrid_command = hybrid_command
 
-    func = get_function_def(tree, func_name)
-    assert func is not None, f"Function {func_name} not found in {FILEPATH}"
+sys.modules.setdefault("discord", types.SimpleNamespace(ext=types.SimpleNamespace(commands=commands_stub)))
+sys.modules.setdefault("discord.ext", types.SimpleNamespace(commands=commands_stub))
 
-    found = False
-    for dec in func.decorator_list:
-        if isinstance(dec, ast.Call) and hasattr(dec.func, "attr"):
-            if dec.func.attr in {"hybrid_command", "hybrid_group", "command"}:
-                for kw in dec.keywords:
-                    if kw.arg == "name" and isinstance(kw.value, ast.Constant):
-                        if kw.value.value == command_name:
-                            found = True
-                            break
-    assert found, f"{func_name} missing decorator name '{command_name}'"
+from src.cogs.utils import Utils
+
+
+class DummyContext:
+    def __init__(self):
+        self.send = AsyncMock()
+
+
+def test_ping_command_sends_latency():
+    """Ensure the ping command sends the bot latency."""
+    bot = types.SimpleNamespace(latency=123)
+    utils_cog = Utils(bot)
+    ctx = DummyContext()
+
+    asyncio.run(utils_cog.utilities_ping(ctx))
+
+    ctx.send.assert_awaited_once_with(f"Pong! {bot.latency}")
