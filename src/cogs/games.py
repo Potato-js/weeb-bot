@@ -1,68 +1,77 @@
 import discord
 import random
-import psycopg
+
+# import psycopg
 
 from discord.ext import commands
-from dotenv import load_dotenv
-from os import getenv
+
+# from dotenv import load_dotenv
+# from os import getenv
 from src.utils.logger import setup_logger
 from src.utils.embeds import EmbedUtils
+from src.utils.database import DatabaseUtils
 
 logger = setup_logger()
-load_dotenv()
-DB_NAME = getenv("DB_NAME")
-DB_USER = getenv("DB_USER")
-DB_PASSWORD = getenv("DB_PASSWORD")
-DB_HOST = getenv("DB_HOST")
-DB_PORT = getenv("DB_PORT")
+# load_dotenv()
+# DB_NAME = getenv("DB_NAME")
+# DB_USER = getenv("DB_USER")
+# DB_PASSWORD = getenv("DB_PASSWORD")
+# DB_HOST = getenv("DB_HOST")
+# DB_PORT = getenv("DB_PORT")
 
-DB_PARAMS = {
-    "dbname": DB_NAME,
-    "user": DB_USER,
-    "password": DB_PASSWORD,
-    "host": DB_HOST,
-    "port": DB_PORT,
-}
+# DB_PARAMS = {
+#     "dbname": DB_NAME,
+#     "user": DB_USER,
+#     "password": DB_PASSWORD,
+#     "host": DB_HOST,
+#     "port": DB_PORT,
+# }
 
 
-def get_db_connection():
-    return psycopg.connect(**DB_PARAMS)
+# def get_db_connection():
+#     return psycopg.connect(**DB_PARAMS)
 
 
 class Games(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        conn = get_db_connection()
-        cursor = conn.cursor()
+    # DatabaseUtils takes care of this
+    # @commands.Cog.listener()
+    # async def on_ready(self):
+    #     conn = get_db_connection()
+    #     cursor = conn.cursor()
 
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS counting_channels (
-                channel_id BIGINT PRIMARY KEY,
-                count INTEGER DEFAULT 1
-            )
-            """
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
+    #     cursor.execute(
+    #         """
+    #         CREATE TABLE IF NOT EXISTS counting_channels (
+    #             channel_id BIGINT PRIMARY KEY,
+    #             count INTEGER DEFAULT 1
+    #         )
+    #         """
+    #     )
+    #     conn.commit()
+    #     cursor.close()
+    #     conn.close()
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
             return
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        # conn = get_db_connection()
+        # cursor = conn.cursor()
         channel_id = message.channel.id
 
-        cursor.execute(
-            "SELECT count FROM counting_channels WHERE channel_id = %s", (channel_id,)
+        result = DatabaseUtils.execute_query(
+            "SELECT count FROM counting_channels WHERE channel_id = %s",
+            (channel_id,),
+            fetch="one",
         )
-        result = cursor.fetchone()
+        # cursor.execute(
+        #     "SELECT count FROM counting_channels WHERE channel_id = %s", (channel_id,)
+        # )
+        # result = cursor.fetchone()
 
         if result:
             current_count = result[0]
@@ -71,11 +80,10 @@ class Games(commands.Cog):
 
                 if user_number == current_count:
                     new_count = current_count + 1
-                    cursor.execute(
+                    DatabaseUtils.execute_query(
                         "UPDATE counting_channels SET count = %s WHERE channel_id = %s",
                         (new_count, channel_id),
                     )
-                    conn.commit()
                     await message.add_reaction("✅")
                 else:
                     wrong_number_em = EmbedUtils.create_embed(
@@ -85,19 +93,15 @@ class Games(commands.Cog):
                         """,
                     )
                     await message.channel.send(embed=wrong_number_em)
-                    cursor.execute(
+                    DatabaseUtils.execute_query(
                         "UPDATE counting_channels SET count = 1 WHERE channel_id = %s",
                         (channel_id,),
                     )
-                    conn.commit()
             except ValueError:
                 invalid_int_embed = EmbedUtils.warning_embed(
                     "❗ | Please enter a valid number!"
                 )
                 await message.channel.send(embed=invalid_int_embed)
-
-        cursor.close()
-        conn.close()
 
     @commands.hybrid_command(
         name="diceroll",
@@ -129,42 +133,35 @@ class Games(commands.Cog):
         try:
             guild = ctx.guild
             existing_channel = discord.utils.get(guild.channels, name="counting")
-            conn = get_db_connection()
-            cursor = conn.cursor()
 
             if existing_channel:
-                cursor.execute(
+                result = DatabaseUtils.execute_query(
                     "SELECT count FROM counting_channels WHERE channel_id = %s",
                     (existing_channel.id,),
+                    fetch="one",
                 )
-                result = cursor.fetchone()
+
                 if result is None:
-                    cursor.execute(
+                    DatabaseUtils.execute_query(
                         "INSERT INTO counting_channels (channel_id, count) VALUES (%s, 1)",
                         (existing_channel.id,),
                     )
-                    conn.commit()
                 embed = EmbedUtils.warning_embed(
                     description=f"A counting channel already exists! Channel: {existing_channel.mention}"
                 )
                 await ctx.send(embed=embed)
-                cursor.close()
-                conn.close()
                 return
 
             counting_channel = await guild.create_text_channel("counting")
-            cursor.execute(
+            DatabaseUtils.execute_query(
                 "INSERT INTO counting_channels (channel_id, count) VALUES (%s, 1)",
                 (counting_channel.id,),
             )
-            conn.commit()
             embed = EmbedUtils.success_embed(
                 description=f"Counting channel created: {counting_channel.mention}",
             )
 
             await ctx.send(embed=embed)
-            cursor.close()
-            conn.close()
         except Exception as e:
             logger.error(f"Error in games_setup_counting: {e}")
             await ctx.send(f"An error occurred: {e}")

@@ -3,6 +3,7 @@ python-dotenv==1.1.1
 pytest==8.4.1
 pytest-asyncio==1.0.0
 wavelink==3.4.1
-psycopg==3.2.9
-# psycopg_binary==3.2.4
-# psycopg_c==3.2.4
+psycopg2-binary==2.9.10
+# psycopg==3.2.9
+# psycopg_binary==3.2.9
+# psycopg_c==3.2.9

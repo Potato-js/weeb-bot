@@ -1,4 +1,4 @@
-import psycopg
+import psycopg2
 from dotenv import load_dotenv
 from os import getenv
 from contextlib import contextmanager
@@ -24,10 +24,10 @@ class DatabaseUtils:
     def get_connection():
         """
         Get a new database connection.
-        Returns a psycopg connection object.
+        Returns a psycopg2 connection object.
         """
         try:
-            return psycopg.connect(**DB_CONFIG)
+            return psycopg2.connect(**DB_CONFIG)
         except Exception as e:
             logger.error(f"Failed to connect to database: {e}")
             raise
@@ -38,12 +38,6 @@ class DatabaseUtils:
         """
         Context manager for database connections.
         Automatically handles connection closing and error handling.
-
-        Usage:
-            with DatabaseUtils.get_connection_context() as conn:
-                cursor = conn.cursor()
-                cursor.execute("SELECT * FROM table")
-                result = cursor.fetchall()
         """
         conn = None
         try:
@@ -64,11 +58,6 @@ class DatabaseUtils:
         """
         Context manager for database cursor operations.
         Automatically handles connection, cursor, commit, and cleanup.
-
-        Usage:
-            with DatabaseUtils.get_cursor_context() as cursor:
-                cursor.execute("SELECT * FROM table")
-                result = cursor.fetchall()
         """
         conn = None
         cursor = None
@@ -117,14 +106,11 @@ class DatabaseUtils:
         This can be called during bot initialization.
         """
         tables = [
-            # Games table (if needed)
+            # Counting channels table
             """
-            CREATE TABLE IF NOT EXISTS games (
-                id SERIAL PRIMARY KEY,
-                user_id BIGINT NOT NULL,
-                game_type VARCHAR(50) NOT NULL,
-                score INTEGER DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            CREATE TABLE IF NOT EXISTS counting_channels (
+                channel_id BIGINT PRIMARY KEY,
+                count INTEGER DEFAULT 1
             )
             """,
             # Role permissions table
