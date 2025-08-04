@@ -15,11 +15,11 @@ class Economy(commands.Cog):
         self.bot = bot
         self.db = DatabaseUtils()
 
-    async def create_balance(self, user):
+    async def create_balance(self, user: discord.Member):
         query = "INSERT INTO bank (user_id, wallet, bank, maxbank) VALUES (%s, %s, %s, %s) ON CONFLICT (user_id) DO NOTHING"
         self.db.execute_query(query, (str(user.id), 0, 100, 25000))
 
-    async def get_balance(self, user):
+    async def get_balance(self, user: discord.Member):
         query = "SELECT wallet, bank, maxbank FROM bank WHERE user_id = %s"
         data = self.db.execute_query(query, (str(user.id),), fetch="one")
         if data is None:
