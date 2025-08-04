@@ -17,12 +17,13 @@ This is a bot I started purely for fun. The bot is fully coded in python. If you
 
 - Python 3.11 or higher
 - PostgreSQL
-- Lavalink 4 (**You can use a server instead of using a local server, But make sure the server has LavaSrc for Spotify Support.**)
+- Lavalink 4
 
 ## Setup
 
 1. Create a `.env` file and refer to the `.env.example` for all environment variables
 2. Install all dependancies using `pip install -r requirements.txt` or `pip3 install -r requirements.txt`
+   - *Note: If you are using windows remove the packages `psycopg_binary` and `psycopg_c`*
 3. Once installed all the dependancies run `python main.py` or `python3 main.py`
 
 ## Roadmap
@@ -50,7 +51,7 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
   - [x] Spotify Support
   - [ ] Interactive UI **
 - [ ] Statistics on some games **
-  - [ ] Valorant (limited to only player stats)
+~~  - [ ] Valorant (limited to only player stats)~~ *Impossible due to Riot's policy*
   - [ ] Hypixel
     - [ ] Bedwars Stats
     - [ ] Skywars Stats
@@ -69,8 +70,9 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
 
 ## Attributions
 
-Used IKEA's [Blahaj](https://www.ikea.com/ca/en/p/blahaj-soft-toy-shark-90373590/) for the currency :)
-Currency Cog based off of [Glowstik's Tutorial](https://www.youtube.com/@glowstik)
+- Used IKEA's [Blahaj](https://www.ikea.com/ca/en/p/blahaj-soft-toy-shark-90373590/) for the currency :)
+- Currency Cog based off of [Glowstik's Tutorial](https://www.youtube.com/@glowstik)
+- ChatGPT for all the celebs and Economy messages
 
 ## License
 
