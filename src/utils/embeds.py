@@ -9,7 +9,7 @@ from typing import Optional, List
 class EmbedUtils:
     @staticmethod
     def create_embed(
-        description: str,
+        description: Optional[str] = None,
         title: Optional[str] = None,
         color: discord.Color = discord.Color.random(),
         fields: Optional[List[dict]] = None,
@@ -21,7 +21,7 @@ class EmbedUtils:
         """
         Creates a Discord embed with the given parameters.
 
-        :param description: The description of the embed (required).
+        :param description: The description of the embed (optional).
         :param title: The title of the embed (optional).
         :param color: The color of the embed border (default: blue).
         :param fields: A list of dictionaries for embed fields. Each dictionary should have 'name', 'value', and optionally 'inline'.

@@ -10,9 +10,10 @@ from src.utils.database import DatabaseUtils
 logger = setup_logger()
 
 
-class FakePerms:
+class FakePerms(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.db = DatabaseUtils()
         self.permission_file = "./json/permissions.json"
         self.permission_flags = self.load_permission_flags()
 
@@ -32,7 +33,7 @@ class FakePerms:
         Retrieve the permissions for a role from the database.
         """
         try:
-            result = DatabaseUtils.execute_query(
+            result = self.db.execute_query(
                 "SELECT permissions FROM role_permissions WHERE role_id = %s",
                 (role_id,),
                 fetch="one",
@@ -49,7 +50,7 @@ class FakePerms:
         Set the permissions for a role in the database.
         """
         try:
-            DatabaseUtils.execute_query(
+            self.db.execute_query(
                 """
                 INSERT INTO role_permissions (role_id, permissions) VALUES (%s, %s)
                 ON CONFLICT (role_id) DO UPDATE SET permissions = EXCLUDED.permissions
@@ -140,5 +141,5 @@ class FakePerms:
         await ctx.send(embed=embed)
 
 
-async def setup(bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(FakePerms(bot))
