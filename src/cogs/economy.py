@@ -9,6 +9,7 @@ from discord.ext import commands
 from src.utils.database import DatabaseUtils
 from src.utils.logger import setup_logger
 from src.utils.embeds import EmbedUtils
+from src.utils.errors import AccountNotFound, InvalidFunds
 
 logger = setup_logger()
 
@@ -53,10 +54,39 @@ class Economy(commands.Cog):
             (data[0] + amount, str(user.id)),
         )
 
+    async def update_bank(self, user: discord.Member, amount: int):
+        query = "SELECT wallet, bank, maxbank FROM bank WHERE user_id = %s"
+        data = self.db.execute_query(query, (str(user.id),), fetch="one")
+        if data is None:
+            await self.create_balance(user)
+            return 0
+        capacity = int(data[2] - data[1])
+        if amount > capacity:
+            await self.update_wallet(user, amount)
+            return 1
+        self.db.execute_query(
+            "UPDATE bank SET bank = %s WHERE user_id = %s",
+            (data[1] + amount, str(user.id)),
+        )
+
     # @commands.Cog.listener()
     # async def on_ready(self):
     #     await asyncio.sleep(3)
     #     await self.setup_database()
+
+    @commands.Cog.listener()
+    async def on_command_error(
+        self, ctx: commands.Context, error: commands.CommandError
+    ):
+        if isinstance(error, AccountNotFound):
+            err_embed = EmbedUtils.warning_embed(error)
+            await ctx.send(embed=err_embed)
+        elif isinstance(error, commands.CommandOnCooldown):
+            embed = EmbedUtils.cooldown_embed(remaining_time=int(error.retry_after))
+            await ctx.send(embed=embed)
+        elif isinstance(error, InvalidFunds):
+            err_embed = EmbedUtils.warning_embed(error)
+            await ctx.send(embed=err_embed)
 
     @commands.hybrid_command(name="balance", aliases=["bal"])
     async def economy_balance(
@@ -69,10 +99,10 @@ class Economy(commands.Cog):
         wallet, bank, maxbank = await self.get_balance(member)
         embed = EmbedUtils.create_embed(title=f"{member.name}'s Balance")
         embed.add_field(
-            name="Wallet", value=f"{wallet} <:blahajCoin:1339437832346796132>"
+            name="Wallet 💳", value=f"{wallet} <:blahajCoin:1339437832346796132>"
         )
         embed.add_field(
-            name="Bank", value=f"{bank}/{maxbank} <:blahajCoin:1339437832346796132>"
+            name="Bank 🏛️", value=f"{bank}/{maxbank} <:blahajCoin:1339437832346796132>"
         )
         await ctx.send(embed=embed)
 
@@ -127,31 +157,105 @@ class Economy(commands.Cog):
 
             res = await self.update_wallet(ctx.author, amount)
             if res == 0:
-                return await ctx.send(
-                    embed=EmbedUtils.error_embed(
-                        "It looks like you don't have a wallet yet! One has been created for you. Rerun the command."
-                    )
-                )
+                raise AccountNotFound()
 
             success_key = random.choice(list(success_messages.keys()))
             message = success_messages[success_key].format(
                 money=f"{amount} <:blahajCoin:1339437832346796132>"
             )
 
-            embed = EmbedUtils.success_embed(f"🤲 **{chosen_name}**: {message}")
+            embed = EmbedUtils.success_embed(f"🤲 | **{chosen_name}**: {message}")
         else:
             fail_key = random.choice(list(fail_messages.keys()))
             message = fail_messages[fail_key]
 
-            embed = EmbedUtils.error_embed(f"😔 **{chosen_name}**: {message}")
+            embed = EmbedUtils.error_embed(f"😔 | **{chosen_name}**: {message}")
 
         await ctx.send(embed=embed)
 
-    @economy_beg.error
-    async def economy_beg_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            embed = EmbedUtils.cooldown_embed(remaining_time=int(error.retry_after))
-            await ctx.send(embed=embed)
+    @commands.hybrid_command(name="withdraw")
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def withdraw(self, ctx: commands.Context, amount):
+        """Withdraw money from your bank."""
+        wallet, bank, maxbank = await self.get_balance(ctx.author)
+        try:
+            amount = int(amount)
+        except ValueError:
+            return await ctx.send(
+                embed=EmbedUtils.error_embed(
+                    "⛔ | Invalid amount. Please enter a valid number."
+                )
+            )
+
+        if isinstance(amount, str):
+            if amount.lower() == "all" or amount.lower() == "max":
+                amount = int(wallet)
+        else:
+            amount = int(amount)
+
+        bank_res = await self.update_bank(ctx.author, -amount)
+        wallet_res = await self.update_wallet(ctx.author, amount)
+        if bank_res == 0 or wallet_res == 0:
+            raise AccountNotFound()
+        elif bank_res == 1:
+            raise InvalidFunds()
+
+        wallet, bank, maxbank = await self.get_balance(ctx.author)
+        embed = EmbedUtils.create_embed(title=f"{amount} has been withdrew!")
+        embed.add_field(
+            name="Updated Wallet 💳",
+            value=f"{wallet} <:blahajCoin:1339437832346796132>",
+        )
+        embed.add_field(
+            name="Updated Bank 🏛️",
+            value=f"{bank}/{maxbank} <:blahajCoin:1339437832346796132>",
+        )
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="deposit", aliases=["dep"])
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def deposit(self, ctx: commands.Context, amount):
+        """Deposit money into your bank."""
+        wallet, bank, maxbank = await self.get_balance(ctx.author)
+        try:
+            amount = int(amount)
+        except ValueError:
+            return await ctx.send(
+                embed=EmbedUtils.error_embed(
+                    "⛔ | Invalid amount. Please enter a valid number."
+                )
+            )
+
+        if isinstance(amount, str):
+            if amount.lower() == "all" or amount.lower() == "max":
+                amount = int(bank)
+        else:
+            amount = int(amount)
+
+        bank_res = await self.update_bank(ctx.author, -amount)
+        wallet_res = await self.update_wallet(ctx.author, amount)
+        if bank_res == 0 or wallet_res == 0:
+            raise AccountNotFound()
+        elif bank_res == 1:
+            raise InvalidFunds()
+
+        wallet, bank, maxbank = await self.get_balance(ctx.author)
+        embed = EmbedUtils.create_embed(title=f"{amount} has been withdrew!")
+        embed.add_field(
+            name="Updated Wallet 💳",
+            value=f"{wallet} <:blahajCoin:1339437832346796132>",
+        )
+        embed.add_field(
+            name="Updated Bank 🏛️",
+            value=f"{bank}/{maxbank} <:blahajCoin:1339437832346796132>",
+        )
+        await ctx.send(embed=embed)
+
+    # @economy_beg.error
+    # async def economy_beg_error(self, ctx: commands.Context, error):
+    #     if isinstance(error, commands.CommandOnCooldown):
+    #         embed = EmbedUtils.cooldown_embed(remaining_time=int(error.retry_after))
+    #         await ctx.send(embed=embed)
 
 
 async def setup(bot: commands.Bot):

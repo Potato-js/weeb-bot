@@ -40,17 +40,15 @@ More features will be added into the roadmap once the ideas start flowing in. (Y
   - [x] Counter
   - [x] Dice Roll
   - [ ] Mock Black Jack
-- [ ] Economy
+- [ ] Economy *
   - [ ] Daily, Weekly, Monthly Claims
-  - [ ] Bank Accounts
+  - [x] Bank Accounts
   - [ ] Gambling 🎰
-  - [ ] Begging
+  - [x] Begging
 - [ ] Music *
   - [ ] Lyrics
-  - [x] Spotify Support
-  - [ ] Interactive UI **
+  - [ ] Interactive UI
 - [ ] Statistics on some games **
-~~  - [ ] Valorant (limited to only player stats)~~ *Impossible due to Riot's policy*
   - [ ] Hypixel
     - [ ] Bedwars Stats
     - [ ] Skywars Stats
