@@ -23,4 +23,16 @@ class EconomyError(WeeabooError):
 class InvalidFunds(EconomyError):
     """Raised when the user has invalid funds in either the bank or wallet"""
 
-    pass
+    def __init__(self, message="⚠️ | You don't have enough funds to do that!", *args):
+        super().__init__(message, *args)
+
+
+class AccountNotFound(EconomyError):
+    """Raised when the user does not have an account in the database"""
+
+    def __init__(
+        self,
+        message="⚠️ | It looks like you don't have a wallet yet! One has been created for you, please rerun the command.",
+        *args
+    ):
+        super().__init__(message, *args)
