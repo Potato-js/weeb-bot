@@ -14,7 +14,7 @@ class FakePerms(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db = DatabaseUtils()
-        self.permission_file = "./json/permissions.json"
+        self.permission_file = "./src/json/permissions.json"
         self.permission_flags = self.load_permission_flags()
 
     def load_permission_flags(self):
