@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from os import getenv
 from src.utils.embeds import EmbedUtils
 from src.utils.logger import setup_logger
-from src.utils.errors import PlayerIsNotAvailable
+from src.utils.errors import *
 
 
 logger = setup_logger()
@@ -69,6 +69,9 @@ class Music(commands.Cog):
         self, ctx: commands.Context, error: commands.CommandError
     ):
         if isinstance(error, PlayerIsNotAvailable):
+            err_embed = EmbedUtils.error_embed(error)
+            await ctx.send(embed=err_embed)
+        elif isinstance(error, QueueIsEmpty):
             err_embed = EmbedUtils.error_embed(error)
             await ctx.send(embed=err_embed)
 
@@ -141,7 +144,7 @@ class Music(commands.Cog):
             except AttributeError:
                 joinvc_embed = EmbedUtils.error_embed(
                     title="Unable to join",
-                    description="⚠ | Join a voice channel before running this command!",
+                    description="⚠️ | Join a voice channel before running this command!",
                 )
                 await ctx.send(embed=joinvc_embed)
                 return
@@ -164,7 +167,7 @@ class Music(commands.Cog):
         if not tracks:
             notrack_embed = EmbedUtils.warning_embed(
                 title="No tracks found",
-                description=f"⚠ | {ctx.author.mention} - Could not find any tracks with the query. Is the playlist/video private?",
+                description=f"⚠️ | {ctx.author.mention} - Could not find any tracks with the query. Is the playlist/video private?",
             )
             await ctx.send(embed=notrack_embed)
             return
@@ -215,13 +218,13 @@ class Music(commands.Cog):
 
         if value > 100:
             tooloud_em = EmbedUtils.warning_embed(
-                description="⚠ | Woah there that's too loud! Make sure it's a value between `0-100`!",
+                description="⚠️ | Woah there that's too loud! Make sure it's a value between `0-100`!",
                 title="Don't go deaf now!",
             )
             await ctx.send(embed=tooloud_em)
         elif value < 0:
             tooquiet_em = EmbedUtils.warning_embed(
-                description="⚠ | We can't even hear it! Make sure it's a value between `0-100`",
+                description="⚠️ | We can't even hear it! Make sure it's a value between `0-100`",
                 title="I CAN'T HEAR YOU!",
             )
             await ctx.send(embed=tooquiet_em)
@@ -274,6 +277,20 @@ class Music(commands.Cog):
             title="Shuffling...",
         )
         await ctx.send(embed=shuffle_embed)
+
+    @commands.hybrid_command(name="queue", aliases=["q", "playlist"])
+    async def music_queue(self, ctx: commands.Context):
+        """Displays the current queue"""
+        player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            raise PlayerIsNotAvailable()
+
+        if not player.queue:
+            await ctx.send("🔄 | The queue is currently empty.")
+            return
+
+        queue_embed = EmbedUtils.queue_embed(player.queue)
+        await ctx.send(embed=queue_embed)
 
     @commands.hybrid_command(name="panel")
     async def music_panel(self, ctx: commands.Context):

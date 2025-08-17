@@ -24,7 +24,7 @@ class Economy(commands.Cog):
     def load_economy_config(self):
         """Load economy configuration from JSON file."""
         try:
-            with open("./json/economy.json", "r") as f:
+            with open("./src/json/economy.json", "r") as f:
                 return json.load(f)
         except FileNotFoundError:
             logger.error("Economy config file not found.")
