@@ -7,17 +7,30 @@ class WeeabooError(commands.CommandError):
     pass
 
 
-class PlayerIsNotAvailable(WeeabooError):
-    """Raised when the Lavalink Player is Not connected to a Voice Channel"""
+class MusicError(WeeabooError):
+    """Raised when there is a music related error"""
 
-    def __init__(self, message="❗ | The bot isn't connected to a VC", *args):
-        super().__init__(message, *args)
+    pass
 
 
 class EconomyError(WeeabooError):
     """Raised when an economy cog error happens"""
 
     pass
+
+
+class PlayerIsNotAvailable(MusicError):
+    """Raised when the Lavalink Player is Not connected to a Voice Channel"""
+
+    def __init__(self, message="❗ | The bot isn't connected to a VC", *args):
+        super().__init__(message, *args)
+
+
+class QueueIsEmpty(MusicError):
+    """Raised when the music queue is empty"""
+
+    def __init__(self, message="🔄 | The music queue is empty", *args):
+        super().__init__(message, *args)
 
 
 class InvalidFunds(EconomyError):
