@@ -157,6 +157,16 @@ class Moderation(commands.Cog):
         )
         await ctx.send(embed=timeout_embed)
 
+    @commands.hybrid_command(name="createrole")
+    @check_perms("manage_roles")
+    async def moderator_create_role(self, ctx: commands.Context, *, role_name: str):
+        """Creates a new role with the specified name (Requires MANAGE_ROLES)"""
+        new_role = await ctx.guild.create_role(name=role_name)
+        embed = EmbedUtils.success_embed(
+            f"✅ | Role `{new_role.name}` created successfully."
+        )
+        await ctx.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(Moderation(bot))

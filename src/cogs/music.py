@@ -16,6 +16,10 @@ from src.utils.errors import *
 
 logger = setup_logger()
 
+load_dotenv()
+LAVALINK_URI = getenv("LAVALINK_URL")
+LAVALINK_PASS = getenv("LAVALINK_PASSWORD")
+
 
 class MusicPanel(discord.ui.View):  # TODO: Complete Music Panel
     def __init__(self, *, timeout=300):
@@ -52,9 +56,6 @@ class Music(commands.Cog):
         self.bot = bot
 
     async def setup_hook(self) -> None:
-        load_dotenv()
-        LAVALINK_URI = getenv("LAVALINK_URL")
-        LAVALINK_PASS = getenv("LAVALINK_PASSWORD")
         nodes = [
             wavelink.Node(uri=LAVALINK_URI, password=LAVALINK_PASS),
         ]
@@ -278,19 +279,19 @@ class Music(commands.Cog):
         )
         await ctx.send(embed=shuffle_embed)
 
-    @commands.hybrid_command(name="queue", aliases=["q", "playlist"])
-    async def music_queue(self, ctx: commands.Context):
-        """Displays the current queue"""
-        player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
-        if not player:
-            raise PlayerIsNotAvailable()
+    # @commands.hybrid_command(name="queue", aliases=["q", "playlist"])
+    # async def music_queue(self, ctx: commands.Context):
+    #     """Displays the current queue"""
+    #     player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
+    #     if not player:
+    #         raise PlayerIsNotAvailable()
 
-        if not player.queue:
-            await ctx.send("🔄 | The queue is currently empty.")
-            return
+    #     if not player.queue:
+    #         await ctx.send("🔄 | The queue is currently empty.")
+    #         return
 
-        queue_embed = EmbedUtils.queue_embed(player.queue)
-        await ctx.send(embed=queue_embed)
+    #     queue_embed = EmbedUtils.queue_embed(player.queue)
+    #     await ctx.send(embed=queue_embed)
 
     @commands.hybrid_command(name="panel")
     async def music_panel(self, ctx: commands.Context):
@@ -302,4 +303,7 @@ class Music(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Music(bot))
+    if LAVALINK_URI and LAVALINK_PASS:
+        await bot.add_cog(Music(bot))
+    else:
+        logger.warning("Lavalink information is either incomplete or missing")

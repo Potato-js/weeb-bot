@@ -140,6 +140,16 @@ class FakePerms(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @mod_fakeperms.command(name="perms", help="List all available fake permissions.")
+    async def fp_permissions_list(self, ctx):
+        """List all available fake permissions."""
+        embed = EmbedUtils.create_embed(
+            title="Available Fake Permissions",
+            description="\n".join(f"`{name}`" for name in self.permission_flags.keys()),
+            color=discord.Color.random(),
+        )
+        await ctx.send(embed=embed)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(FakePerms(bot))
