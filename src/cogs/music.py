@@ -338,11 +338,13 @@ class Music(commands.Cog):
                     if not player.playing and self.message:
                         try:
                             await self.message.delete()
-                        except:
+                        except Exception:
                             pass
 
                 @discord.ui.button(label="◀️", style=discord.ButtonStyle.grey)
-                async def previous_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+                async def previous_page(
+                    self, interaction: discord.Interaction, button: discord.ui.Button
+                ):
                     if self.current_page > 0:
                         self.current_page -= 1
                         await interaction.response.edit_message(
@@ -358,7 +360,9 @@ class Music(commands.Cog):
                         )
 
                 @discord.ui.button(label="▶️", style=discord.ButtonStyle.grey)
-                async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+                async def next_page(
+                    self, interaction: discord.Interaction, button: discord.ui.Button
+                ):
                     if self.current_page < pages - 1:
                         self.current_page += 1
                         await interaction.response.edit_message(
