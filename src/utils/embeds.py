@@ -2,8 +2,13 @@
 All embed utilities incl. success, error, cooldown, warning
 """
 
-import discord
+from datetime import datetime
 from typing import Optional, List
+
+
+import discord
+
+YEAR = datetime.now().year
 
 
 class EmbedUtils:
@@ -13,7 +18,7 @@ class EmbedUtils:
         title: Optional[str] = None,
         color: discord.Color = discord.Color.random(),
         fields: Optional[List[dict]] = None,
-        footer: Optional[str] = "© 2025 weeaboo",
+        footer: Optional[str] = f"© {YEAR} weeaboo",
         thumbnail_url: Optional[str] = None,
         image_url: Optional[str] = None,
         author: Optional[dict] = None,

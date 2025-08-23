@@ -28,7 +28,11 @@ async def load_cogs():
 @bot.event
 async def on_ready():
     logger.info(f"Client {bot.user} is ready")
-    synced = await bot.tree.sync(guild=GUILD_ID)
+    synced = (
+        await bot.tree.sync(guild=GUILD_ID)
+        if GUILD_ID is not None
+        else await bot.tree.sync()
+    )
     print(f"Synced {len(synced)} command(s)")
 
 

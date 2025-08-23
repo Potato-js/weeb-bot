@@ -1,4 +1,5 @@
 import asyncio
+import math
 
 from typing import cast
 
@@ -272,26 +273,115 @@ class Music(commands.Cog):
         if not player:
             raise PlayerIsNotAvailable()
 
-        await player.queue.shuffle()
-        shuffle_embed = EmbedUtils.success_embed(
-            description=f"🔀 | Shuffling the queue of **{len(player.queue)} songs**",
-            title="Shuffling...",
-        )
-        await ctx.send(embed=shuffle_embed)
+        try:
+            player.queue.shuffle()
+            shuffle_embed = EmbedUtils.success_embed(
+                description=f"🔀 | Shuffling the queue of **{len(player.queue)} songs**",
+                title="Shuffling...",
+            )
+            await ctx.send(embed=shuffle_embed)
+        except Exception as e:
+            error_embed = EmbedUtils.error_embed(
+                description=f"⚠️ | An error occurred while shuffling the queue: {str(e)}"
+            )
+            await ctx.send(embed=error_embed)
 
-    # @commands.hybrid_command(name="queue", aliases=["q", "playlist"])
-    # async def music_queue(self, ctx: commands.Context):
-    #     """Displays the current queue"""
-    #     player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
-    #     if not player:
-    #         raise PlayerIsNotAvailable()
+    @commands.hybrid_command(name="queue", aliases=["q", "playlist"])
+    async def music_queue(self, ctx: commands.Context):
+        """Displays the current queue"""
+        player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            raise PlayerIsNotAvailable()
 
-    #     if not player.queue:
-    #         await ctx.send("🔄 | The queue is currently empty.")
-    #         return
+        try:
+            queue = player.queue
+            pages = math.ceil(len(queue) / 10)
 
-    #     queue_embed = EmbedUtils.queue_embed(player.queue)
-    #     await ctx.send(embed=queue_embed)
+            def create_embed(page):
+                embed = EmbedUtils.create_embed(
+                    title=f"Queue for {ctx.guild.name}",
+                )
+                start_index = page * 10
+                end_index = start_index + 10
+
+                # Add now playing line
+                current_track = player.current
+                embed.add_field(
+                    name="Now Playing",
+                    value=f"[{current_track.title} - {current_track.author}]({current_track.uri})",
+                    inline=False,
+                )
+                embed.add_field(
+                    name="----------------------------------", value=None, inline=False
+                )
+
+                # Next 10 tracks of the song
+                for i in range(start_index, end_index):
+                    track = queue[i]
+                    embed.add_field(
+                        name=f"{i + 1}. {track.title}",
+                        value=f"by `{track.author}` | [link]({track.uri})",
+                        inline=False,
+                    )
+
+                embed.set_footer(text=f"Page {page + 1}/{pages}")
+
+                return embed
+
+            class QueueView(discord.ui.View):
+                def __init__(self):
+                    super().__init__(timeout=300)
+                    self.current_page = 0
+                    self.message = None
+
+                async def on_timeout(self):
+                    if not player.playing and self.message:
+                        try:
+                            await self.message.delete()
+                        except:
+                            pass
+
+                @discord.ui.button(label="◀️", style=discord.ButtonStyle.grey)
+                async def previous_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+                    if self.current_page > 0:
+                        self.current_page -= 1
+                        await interaction.response.edit_message(
+                            embed=create_embed(self.current_page)
+                        )
+                    else:
+                        warning_embed = EmbedUtils.warning_embed(
+                            description="⚠️ | You've reached the beginning of the queue! Add some more songs to expand on it!",
+                            title="Woah there!",
+                        )
+                        await interaction.response.send_message(
+                            embed=warning_embed, ephemeral=True
+                        )
+
+                @discord.ui.button(label="▶️", style=discord.ButtonStyle.grey)
+                async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+                    if self.current_page < pages - 1:
+                        self.current_page += 1
+                        await interaction.response.edit_message(
+                            embed=create_embed(self.current_page)
+                        )
+                    else:
+                        warning_embed = EmbedUtils.warning_embed(
+                            description="⚠️ | You've reached the end of the queue! Add some more songs to expand on it!",
+                            title="Woah there!",
+                        )
+                        await interaction.response.send_message(
+                            embed=warning_embed, ephemeral=True
+                        )
+
+            initial_embed = create_embed(0)
+            view = QueueView()
+            response = await ctx.send(embed=initial_embed, view=view)
+            view.message = response
+            await view.wait()
+
+        except wavelink.QueueEmpty:
+            error_embed = EmbedUtils.warning_embed(description="❗ | Queue is empty!")
+            await ctx.send(embed=error_embed)
 
     @commands.hybrid_command(name="panel")
     async def music_panel(self, ctx: commands.Context):

@@ -66,7 +66,7 @@ class Moderation(commands.Cog):
         ctx: commands.Context,
         member: discord.Member,
         *,
-        duration: Optional[str] = "30d",
+        duration: Optional[str] = "1d",
         reason: Optional[str] = "No reason provided.",
     ):
         """Bans a specified member (Requires BAN_MEMBERS)"""
@@ -166,6 +166,132 @@ class Moderation(commands.Cog):
             f"✅ | Role `{new_role.name}` created successfully."
         )
         await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="deleterole")
+    @check_perms("manage_roles")
+    async def moderator_delete_role(self, ctx: commands.Context, role: discord.Role):
+        """Deletes a specified role (Requires MANAGE_ROLES)"""
+        await role.delete()
+        embed = EmbedUtils.success_embed(
+            f"✅ | Role `{role.name}` deleted successfully."
+        )
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="setup_jail")
+    @check_perms("administrator")
+    async def setup_jail(self, ctx: commands.Context):
+        """Sets up a jail system: creates a 'Jail' category, 'jail' channel, and 'Jailed' role. Restricts jailed users to only see the jail channel."""
+        guild = ctx.guild
+        # Create 'Jailed' role if it doesn't exist
+        jailed_role = discord.utils.get(guild.roles, name="Jailed")
+        if not jailed_role:
+            jailed_role = await guild.create_role(
+                name="Jailed", reason="Jail system setup"
+            )
+
+        # Deny all permissions for @everyone in jail channel
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(view_channel=False),
+            jailed_role: discord.PermissionOverwrite(
+                view_channel=True, send_messages=True, read_message_history=True
+            ),
+            guild.me: discord.PermissionOverwrite(
+                view_channel=True, send_messages=True, read_message_history=True
+            ),
+        }
+
+        # Create 'Jail' category if it doesn't exist
+        category = discord.utils.get(guild.categories, name="Jail")
+        if not category:
+            category = await guild.create_category("Jail", reason="Jail system setup")
+
+        # Create 'jail' channel if it doesn't exist
+        jail_channel = discord.utils.get(category.channels, name="jail")
+        if not jail_channel:
+            jail_channel = await guild.create_text_channel(
+                "jail",
+                category=category,
+                overwrites=overwrites,
+                reason="Jail system setup",
+            )
+
+        # Set permissions for all other roles to not view the jail channel
+        for role in guild.roles:
+            if role not in [guild.default_role, jailed_role, guild.me.top_role]:
+                await jail_channel.set_permissions(role, view_channel=False)
+
+        # Set view_channel=False for 'Jailed' role on all channels except 'jail'
+        for channel in guild.channels:
+            if channel != jail_channel:
+                try:
+                    await channel.set_permissions(jailed_role, view_channel=False)
+                except Exception:
+                    pass
+
+        embed = EmbedUtils.success_embed(
+            "✅ | Jail system setup complete! 'Jailed' role, 'Jail' category, and 'jail' channel created. Jailed users can only see the jail channel."
+        )
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="jail")
+    @check_perms("manage_members")
+    async def jail_member(
+        self,
+        ctx: commands.Context,
+        member: discord.Member,
+        duration: Optional[str] = "1d",
+        *,
+        reason: str = "No reason provided.",
+    ):
+        """Jails a member by assigning the 'Jailed' role and removing other roles for a duration."""
+        guild = ctx.guild
+        jailed_role = discord.utils.get(guild.roles, name="Jailed")
+        if not jailed_role:
+            err_embed = EmbedUtils.error_embed(
+                "❗ | 'Jailed' role does not exist. Please run /setup_jail first."
+            )
+            await ctx.send(embed=err_embed)
+            return
+
+        seconds = self.parse_duration(duration)
+        if seconds is None or seconds <= 0:
+            err_embed = EmbedUtils.error_embed(
+                "❗ | Invalid duration format. Use something like '12h' or '30d'."
+            )
+            await ctx.send(embed=err_embed)
+            return
+
+        # Remove all roles except @everyone and assign 'Jailed' role
+        roles_to_remove = [
+            role
+            for role in member.roles
+            if role != guild.default_role and role != jailed_role
+        ]
+        try:
+            await member.remove_roles(*roles_to_remove, reason=f"Jailed: {reason}")
+            await member.add_roles(jailed_role, reason=f"Jailed: {reason}")
+        except discord.Forbidden:
+            err_embed = EmbedUtils.error_embed(
+                "❗ | I do not have permission to modify this member's roles. Try putting me higher in the role hierarchy."
+            )
+            await ctx.send(embed=err_embed)
+            return
+
+        embed = EmbedUtils.success_embed(
+            f"🚨 | {member.mention} has been jailed for {duration}. Reason: {reason}"
+        )
+        await ctx.send(embed=embed)
+
+        # Wait for the duration, then unjail
+        await asyncio.sleep(seconds)
+        try:
+            await member.remove_roles(jailed_role, reason="Jail duration expired.")
+            unjail_embed = EmbedUtils.success_embed(
+                f"🔓 | {member.mention} has been released from jail after {duration}."
+            )
+            await ctx.send(embed=unjail_embed)
+        except Exception:
+            pass
 
 
 async def setup(bot):
