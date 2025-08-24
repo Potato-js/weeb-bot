@@ -2,6 +2,7 @@ import asyncio
 import math
 
 from typing import cast
+from datetime import timedelta
 
 import discord
 import wavelink
@@ -384,8 +385,37 @@ class Music(commands.Cog):
             await view.wait()
 
         except wavelink.QueueEmpty:
-            error_embed = EmbedUtils.warning_embed(description="❗ | Queue is empty!")
-            await ctx.send(embed=error_embed)
+            raise QueueIsEmpty()
+
+    @commands.hybrid_command(name="nowplaying", aliases=["np", "current"])
+    async def music_now_playing(self, ctx: commands.Context):
+        player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            raise PlayerIsNotAvailable()
+
+        if not player.current:
+            raise QueueIsEmpty()
+
+        track: wavelink.Playable = player.current
+
+        # Track Duration + Progress Bar
+        duration = track.length if track.length else 0
+        duration_formatted = (
+            str(timedelta(milliseconds=int(duration)))
+            if duration and not track.is_stream
+            else "🔴|LIVE"
+        )
+
+        progress = player.position / duration if duration else 0
+        progress_bar = "[{0}{1}]".format(
+            "■" * int(progress * 10), "□" * (10 - int(progress * 10))
+        )
+
+        description = f"[{track.title} by {track.author}]({track.uri}) \n"
+        description += f"Duration: {duration_formatted}  {progress_bar}"
+
+        embed = EmbedUtils.create_embed(title="Now Playing", description=description)
+        await ctx.send(embed=embed, delete_after=7)
 
     @commands.hybrid_command(name="panel")
     async def music_panel(self, ctx: commands.Context):
