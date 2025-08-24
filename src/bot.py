@@ -18,11 +18,14 @@ async def load_cogs():
     for fn in os.listdir("./src/cogs"):
         if fn.endswith(".py"):
             cog = f"src.cogs.{fn[:-3]}"
-            try:
-                await bot.load_extension(cog)
-                logger.info(f"Loaded {cog}")
-            except Exception as e:
-                logger.warning(f"Failed to load {cog} \n{e}")
+            if cog == "src.cogs.__init__":
+                return
+            else:
+                try:
+                    await bot.load_extension(cog)
+                    logger.info(f"Loaded {cog}")
+                except Exception as e:
+                    logger.warning(f"Failed to load {cog} \n{e}")
 
 
 @bot.event
