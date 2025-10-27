@@ -1,5 +1,5 @@
 discord.py==2.6.2
-python-dotenv==1.1.1
+python-dotenv==1.2.1
 pytest==8.4.1
 pytest-asyncio==1.1.0
 wavelink==3.4.1
