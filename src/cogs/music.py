@@ -2,7 +2,6 @@ import asyncio
 import math
 
 from typing import cast
-from datetime import timedelta
 
 import discord
 import wavelink
@@ -14,6 +13,7 @@ from os import getenv
 from src.utils.embeds import EmbedUtils
 from src.utils.logger import setup_logger
 from src.utils.errors import *
+from src.utils.utils import parse_duration
 
 
 logger = setup_logger()
@@ -400,22 +400,77 @@ class Music(commands.Cog):
 
         # Track Duration + Progress Bar
         duration = track.length if track.length else 0
-        duration_formatted = (
-            str(timedelta(milliseconds=int(duration)))
-            if duration and not track.is_stream
-            else "🔴|LIVE"
-        )
+        if duration and not track.is_stream:
+            total_seconds = int(duration // 1000)
+            hours = total_seconds // 3600
+            minutes = (total_seconds % 3600) // 60
+            seconds = total_seconds % 60
+            if hours > 0:
+                duration_formatted = f"{hours:01}:{minutes:02}:{seconds:02}"
+            else:
+                duration_formatted = f"{minutes:02}:{seconds:02}"
+        else:
+            duration_formatted = "🔴|LIVE"
 
         progress = player.position / duration if duration else 0
-        progress_bar = "[{0}{1}]".format(
-            "■" * int(progress * 10), "□" * (10 - int(progress * 10))
-        )
+        bar_length = 15
+        pos = int(progress * bar_length)
+        if pos >= bar_length:
+            pos = bar_length - 1
+        bar = ""
+        for i in range(bar_length):
+            if i < pos:
+                bar += "━"
+            elif i == pos:
+                bar += "●"
+            else:
+                bar += "─"
+        progress_bar = bar
 
         description = f"[{track.title} by {track.author}]({track.uri}) \n"
         description += f"Duration: {duration_formatted}  {progress_bar}"
 
         embed = EmbedUtils.create_embed(title="Now Playing", description=description)
         await ctx.send(embed=embed, delete_after=7)
+
+    @commands.hybrid_command(name="fastforward", aliases=["ff", "seek"])
+    async def music_fastforward(self, ctx: commands.Context, *, time: str = "10s"):
+        player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            raise PlayerIsNotAvailable()
+
+        if not player.current:
+            raise QueueIsEmpty()
+
+        new_time = parse_duration(time) * 1000
+
+        if time == "restart".lower():
+            new_time = 0
+        elif new_time > player.current.length:
+            warn_embed = EmbedUtils.warning_embed(
+                description="⚠️ | You can't fast forward beyond the end of the track!",
+                title="What is there to fast forward?!",
+            )
+            await ctx.send(embed=warn_embed, ephemeral=True)
+        else:
+            await player.seek(new_time)
+            await ctx.message.add_reaction("⏩")
+
+    @commands.hybrid_command(name="rewind", aliases=["rw", "back"])
+    async def music_rewind(self, ctx: commands.Context, *, time: str = "10s"):
+        """Rewinds the current song by a given time (default 10s)"""
+        player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            raise PlayerIsNotAvailable()
+
+        if not player.current:
+            raise QueueIsEmpty()
+
+        rewind_ms = parse_duration(time) * 1000
+        new_time = max(0, player.position - rewind_ms)
+
+        await player.seek(new_time)
+        await ctx.message.add_reaction("⏪")
 
     @commands.hybrid_command(name="panel")
     async def music_panel(self, ctx: commands.Context):
